@@ -18,13 +18,13 @@ struct Pet: JSONCodable {
     }
     """
     
-    static var keyPathsByJSONKeyPaths: [String : JSONKeyPathProtocol] = [
-        "kind": JSONKeyPath(keyPath: "pet_kind"),
-        "createdAt": JSONDateKeyPath(keyPath: JSONKeyPath(keyPath: "createdAt"), customAdapter: { (_) -> Date in
+    static let transformers: [JSONTransformer] = [
+        JSONKeyPathTransformer(propertyName: "kind", keyPath: JSONKeyPath("pet_kind")),
+        JSONDateTransformer(propertyName: "createdAt", customAdapter: { (_) -> Date in
             return Date()
-        }),
+        })
     ]
-    
+
     enum Kind: String, Codable {
         case dog
         case cat
@@ -38,6 +38,17 @@ struct Pet: JSONCodable {
 
 struct Person: JSONCodable {
     
+    static let kidJSONString = """
+    {
+    "full_name": "Devon Redfern",
+    "age": 6,
+    "gender": "female",
+    "date_of_birth": "3/24/1992",
+    "personalWebsite": "https://mulesoft.com",
+    "kids": []
+    }
+    """
+    
     static let jsonString: String = """
     {
     "full_name": "Jeff Hurray",
@@ -45,21 +56,17 @@ struct Person: JSONCodable {
     "gender": "male",
     "date_of_birth": "10/25/1992",
     "personalWebsite": "https://google.com",
-    "pet_thing": \(Pet.jsonString)
+    "pet_thing": \(Pet.jsonString),
+    "kids": [\(kidJSONString), \(kidJSONString)]
     }
     """
     
-    static let petKeyPath = JSONKeyPath(keyPath: "pet_thing")
-    
-    static let keyPathsByJSONKeyPaths: [String: JSONKeyPathProtocol] = [
-        "name": JSONKeyPath(keyPath: "full_name"),
-        "pet": petKeyPath,
-        "petName": JSONKeyPath(keys: "pet_thing", "name"),
-        "birthday": JSONDateKeyPath(keyPath: JSONKeyPath(keyPath: "date_of_birth"), dateFormat: .custom(format: "mm/dd/YYYY")),
-    ]
-    
-    static let nestedTypes: [JSONNestedType] = [
-        JSONNestedType(keyPath: petKeyPath , type: Pet.self)
+    static let transformers: [JSONTransformer] = [
+        JSONNestedObjectTransformer(propertyName: "pet", keyPath: JSONKeyPath("pet_thing"), type: Pet.self),
+        JSONKeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("full_name")),
+        JSONKeyPathTransformer(propertyName: "petName", keyPath: JSONKeyPath(keys: "pet_thing", "name")),
+        JSONDateTransformer(propertyName: "birthday", keyPath: JSONKeyPath("date_of_birth"), dateFormat: .custom(format: "mm/dd/YYYY")),
+        JSONNestedListTransformer(propertyName: "kids", type: Person.self),
     ]
     
     enum Gender: String, Codable {
@@ -70,8 +77,9 @@ struct Person: JSONCodable {
     let name: String
     let age: Int
     let gender: Gender
-    let pet: Pet
-    let petName: String
+    let pet: Pet?
+    let petName: String?
     let personalWebsite: URL
     let birthday: Date
+    let kids: [Person]
 }

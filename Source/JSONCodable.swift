@@ -10,20 +10,17 @@ import Foundation
 
 public protocol JSONCodable: Codable {
     
-    init?(json: [String: Any])
+    init(json: [String: Any]) throws
     
-    static var keyPathsByJSONKeyPaths: [String: JSONKeyPathProtocol] { get }
-    static var nestedTypes: [JSONNestedType] { get }
+    static var transformers: [JSONTransformer] { get }
 }
 
 public extension Array where Element: JSONCodable {
     
-    init?(jsonList: [[String: Any]]) {
+    init(jsonList: [[String: Any]]) throws {
         var list: [Element] = []
         for json in jsonList {
-            guard let object = Element(json: json) else {
-                return nil
-            }
+            let object = try Element(json: json)
             list.append(object)
         }
         self = list
@@ -32,76 +29,25 @@ public extension Array where Element: JSONCodable {
 
 public extension JSONCodable {
     
-    public init?(json: [String: Any]) {
+    public init(json: [String: Any]) throws {
         var json = json
-        for nestedType in Self.nestedTypes {
-            guard let nestedJSON = json[jsonKeyPath: nestedType.keyPath] as? [String: Any] else {
-                return nil
-            }
-            let alteredJSON = nestedType.type.alter(nestedJSON)
-            json[jsonKeyPath: nestedType.keyPath] = alteredJSON
-        }
         json = Self.alter(json)
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: json, options: []) else {
-            return nil
-        }
+        let jsonData = try JSONSerialization.data(withJSONObject: json, options: [])
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .millisecondsSince1970
-        guard let instance = try? decoder.decode(Self.self, from: jsonData) else {
-            return nil
-        }
+        let instance = try decoder.decode(Self.self, from: jsonData)
         self = instance
     }
     
-    private static func alter(_ json: [String: Any]) -> [String: Any] {
+    internal static func alter(_ json: [String: Any]) -> [String: Any] {
         var json = json
-        for mapping in Self.keyPathsByJSONKeyPaths {
-            switch mapping.value {
-            case let dateKeyPath as JSONDateKeyPath:
-                
-                if let customAdapter = dateKeyPath.customAdapter {
-                    let date = customAdapter(json[jsonKeyPath: dateKeyPath])
-                    let dateFormatter = JSONDateKeyPath.DateFormat.millisecondsSince1970.dateFormatter
-                    json[mapping.key] = Int(dateFormatter.string(from: date))
-                    continue
-                }
-                
-                let possibleDateString: String?
-                switch json[jsonKeyPath: dateKeyPath] {
-                case let unformattedDateString as String:
-                    possibleDateString = unformattedDateString
-                case let timestamp as TimeInterval:
-                    possibleDateString = String(timestamp)
-                case let timestamp as Int:
-                    possibleDateString = String(timestamp)
-                default:
-                    continue
-                }
-                guard let dateString = possibleDateString else {
-                    continue
-                }
-                guard dateKeyPath.dateFormat != .millisecondsSince1970 else {
-                    json[mapping.key] = Int(dateString)
-                    continue
-                }
-                if let millisecondsSince1970String = DateFormatAdapter.shared.convert(dateString, fromFormat: dateKeyPath.dateFormat, toFormat: .millisecondsSince1970) {
-                    json[mapping.key] = Int(millisecondsSince1970String)
-                }
-                
-            case let keyPath as JSONKeyPath:
-                json[mapping.key] = json[jsonKeyPath: keyPath]
-            default:
-                break
-            }
+        for transformer in Self.transformers {
+            transformer.transform(&json)
         }
         return json
     }
     
-    public static var nestedTypes: [JSONNestedType] {
+    public static var transformers: [JSONTransformer] {
         return []
-    }
-    
-    public static var keyPathsByJSONKeyPaths: [String: JSONKeyPathProtocol] {
-        return [:]
     }
 }

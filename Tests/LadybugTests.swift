@@ -26,10 +26,13 @@ class LadybugTests: XCTestCase {
     }
     
     func testInit() {
-        let person = Person(json: json)
-        XCTAssertNotNil(person)
-        let pet = person?.pet
-        XCTAssertNotNil(pet)
+        do {
+            let person = try Person(json: json)
+            let pet = person.pet
+            XCTAssertNotNil(pet)
+        } catch let error {
+            XCTFail("Unsuccesful initialization: \(error)")
+        }
     }
     
 }

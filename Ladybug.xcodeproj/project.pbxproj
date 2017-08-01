@@ -22,14 +22,11 @@
 		26AF15971F2D80C000D963FF /* JSONKeyPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF15921F2D721900D963FF /* JSONKeyPath.swift */; };
 		26AF15981F2D80C000D963FF /* JSONKeyPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF15921F2D721900D963FF /* JSONKeyPath.swift */; };
 		26AF159B1F2D866500D963FF /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF15991F2D829200D963FF /* Person.swift */; };
-		26AF159D1F2D993F00D963FF /* JSONNestedType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF159C1F2D993F00D963FF /* JSONNestedType.swift */; };
-		26AF159E1F2D994200D963FF /* JSONNestedType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF159C1F2D993F00D963FF /* JSONNestedType.swift */; };
-		26AF159F1F2D994200D963FF /* JSONNestedType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF159C1F2D993F00D963FF /* JSONNestedType.swift */; };
-		26AF15A01F2D994300D963FF /* JSONNestedType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF159C1F2D993F00D963FF /* JSONNestedType.swift */; };
 		26AF15A21F2EE2E300D963FF /* DateFormatAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF15A11F2EE2E300D963FF /* DateFormatAdapter.swift */; };
 		26AF15A31F2F0BB800D963FF /* DateFormatAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF15A11F2EE2E300D963FF /* DateFormatAdapter.swift */; };
 		26AF15A41F2F0BB900D963FF /* DateFormatAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF15A11F2EE2E300D963FF /* DateFormatAdapter.swift */; };
 		26AF15A51F2F0BBA00D963FF /* DateFormatAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF15A11F2EE2E300D963FF /* DateFormatAdapter.swift */; };
+		26C272531F3005EB002537C5 /* JSONTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C272521F3005EB002537C5 /* JSONTransformer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,8 +52,8 @@
 		26AF158D1F2D71D200D963FF /* JSONCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONCodable.swift; sourceTree = "<group>"; };
 		26AF15921F2D721900D963FF /* JSONKeyPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONKeyPath.swift; sourceTree = "<group>"; };
 		26AF15991F2D829200D963FF /* Person.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
-		26AF159C1F2D993F00D963FF /* JSONNestedType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONNestedType.swift; sourceTree = "<group>"; };
 		26AF15A11F2EE2E300D963FF /* DateFormatAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatAdapter.swift; sourceTree = "<group>"; };
+		26C272521F3005EB002537C5 /* JSONTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONTransformer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,7 +142,7 @@
 			children = (
 				26AF158D1F2D71D200D963FF /* JSONCodable.swift */,
 				26AF15921F2D721900D963FF /* JSONKeyPath.swift */,
-				26AF159C1F2D993F00D963FF /* JSONNestedType.swift */,
+				26C272521F3005EB002537C5 /* JSONTransformer.swift */,
 				26AF15A11F2EE2E300D963FF /* DateFormatAdapter.swift */,
 			);
 			path = Source;
@@ -372,8 +369,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				26AF158E1F2D71D200D963FF /* JSONCodable.swift in Sources */,
-				26AF159D1F2D993F00D963FF /* JSONNestedType.swift in Sources */,
 				26AF15A21F2EE2E300D963FF /* DateFormatAdapter.swift in Sources */,
+				26C272531F3005EB002537C5 /* JSONTransformer.swift in Sources */,
 				26AF15931F2D721900D963FF /* JSONKeyPath.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -392,7 +389,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				26AF15961F2D80BF00D963FF /* JSONKeyPath.swift in Sources */,
-				26AF159E1F2D994200D963FF /* JSONNestedType.swift in Sources */,
 				26AF15A31F2F0BB800D963FF /* DateFormatAdapter.swift in Sources */,
 				26AF158F1F2D71DC00D963FF /* JSONCodable.swift in Sources */,
 			);
@@ -403,7 +399,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				26AF15971F2D80C000D963FF /* JSONKeyPath.swift in Sources */,
-				26AF159F1F2D994200D963FF /* JSONNestedType.swift in Sources */,
 				26AF15A41F2F0BB900D963FF /* DateFormatAdapter.swift in Sources */,
 				26AF15901F2D71DC00D963FF /* JSONCodable.swift in Sources */,
 			);
@@ -414,7 +409,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				26AF15981F2D80C000D963FF /* JSONKeyPath.swift in Sources */,
-				26AF15A01F2D994300D963FF /* JSONNestedType.swift in Sources */,
 				26AF15A51F2F0BBA00D963FF /* DateFormatAdapter.swift in Sources */,
 				26AF15911F2D71DD00D963FF /* JSONCodable.swift in Sources */,
 			);
