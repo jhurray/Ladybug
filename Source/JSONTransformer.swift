@@ -44,11 +44,11 @@ public struct JSONNestedObjectTransformer: JSONTransformer {
     }
 
     public func transform(_ json: inout [String: Any]) {
-        guard let nestedJSON = json[jsonKeyPath: keyPath] as? [String: Any] else {
+        guard var nestedJSON = json[jsonKeyPath: keyPath] as? [String: Any] else {
             return
         }
-        let alteredJSON = type.alter(nestedJSON)
-        json[propertyName] = alteredJSON
+        type.alter(&nestedJSON)
+        json[propertyName] = nestedJSON
     }
 }
 
@@ -74,8 +74,9 @@ public struct JSONNestedListTransformer: JSONTransformer {
             return
         }
         var alteredJSONList: [[String: Any]] = []
-        for nestedJSON in nestedJSONList {
-            alteredJSONList.append(type.alter(nestedJSON))
+        for var nestedJSON in nestedJSONList {
+            type.alter(&nestedJSON)
+            alteredJSONList.append(nestedJSON)
         }
         json[propertyName] = alteredJSONList
     }

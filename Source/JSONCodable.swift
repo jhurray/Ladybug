@@ -31,7 +31,7 @@ public extension JSONCodable {
     
     public init(json: [String: Any]) throws {
         var json = json
-        json = Self.alter(json)
+        Self.alter(&json)
         let jsonData = try JSONSerialization.data(withJSONObject: json, options: [])
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .millisecondsSince1970
@@ -39,12 +39,10 @@ public extension JSONCodable {
         self = instance
     }
     
-    internal static func alter(_ json: [String: Any]) -> [String: Any] {
-        var json = json
+    internal static func alter(_ json: inout [String: Any]) {
         for transformer in Self.transformers {
             transformer.transform(&json)
         }
-        return json
     }
     
     public static var transformers: [JSONTransformer] {
