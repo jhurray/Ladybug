@@ -80,7 +80,7 @@ struct Person: JSONCodable {
         JSONNestedObjectTransformer(propertyName: "pet", keyPath: JSONKeyPath("pet_thing"), type: Pet.self),
         JSONKeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("full_name")),
         JSONKeyPathTransformer(propertyName: "petName", keyPath: JSONKeyPath("pet_thing", "name")),
-        JSONDateTransformer(propertyName: "birthday", keyPath: JSONKeyPath("date_of_birth"), dateFormat: .custom(format: "mm/dd/YYYY")),
+        JSONDateTransformer(propertyName: "birthday", keyPath: JSONKeyPath("date_of_birth"), dateFormat: .custom(format: "MM/dd/yyyy")),
         JSONNestedListTransformer(propertyName: "kids", type: Person.self),
         JSONNestedObjectTransformer(propertyName: "favoritePet", keyPath: JSONKeyPath("pets", 1) , type: Pet.self),
     ]
