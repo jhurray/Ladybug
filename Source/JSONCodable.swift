@@ -10,14 +10,24 @@ import Foundation
 
 public protocol JSONCodable: Codable {
     
-    init(json: [String: Any]) throws
+    init(json: Any) throws
     
     static var transformers: [JSONTransformer] { get }
 }
 
+public enum JSONCodableError: Swift.Error {
+    case badType(expectedType: Any.Type, receivedType: Any.Type)
+}
+
 public extension Array where Element: JSONCodable {
     
-    init(jsonList: [[String: Any]]) throws {
+    init(json: Any) throws {
+        guard let objectList = json as? [Any] else {
+            throw JSONCodableError.badType(expectedType: [Any].self, receivedType: type(of: json))
+        }
+        guard let jsonList = objectList as? [[String: Any]] else {
+            throw JSONCodableError.badType(expectedType: [[String: Any]].self, receivedType: type(of: objectList))
+        }
         var list: [Element] = []
         for json in jsonList {
             let object = try Element(json: json)
@@ -29,10 +39,12 @@ public extension Array where Element: JSONCodable {
 
 public extension JSONCodable {
     
-    public init(json: [String: Any]) throws {
-        var json = json
-        Self.alter(&json)
-        let jsonData = try JSONSerialization.data(withJSONObject: json, options: [])
+    public init(json: Any) throws {
+        guard var jsonDictionary = json as? [String: Any] else {
+            throw JSONCodableError.badType(expectedType: [String: Any].self, receivedType: type(of: json))
+        }
+        Self.alter(&jsonDictionary)
+        let jsonData = try JSONSerialization.data(withJSONObject: jsonDictionary, options: [])
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .millisecondsSince1970
         let instance = try decoder.decode(Self.self, from: jsonData)

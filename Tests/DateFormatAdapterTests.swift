@@ -9,51 +9,127 @@
 import XCTest
 @testable import Ladybug
 
-class DateFormatAdapterTests: XCTestCase {
+protocol DateFormatAdapterTest {
     
-    let adapter = DateFormatAdapter.shared
-    var timeIntervalString: String!
+    var fromFormat: JSONDateTransformer.DateFormat { get }
+    var dateString: String! { get }
+    var adapter: DateFormatAdapter { get }
     
-    override func setUp() {
-        super.setUp()
+    func testSecondsSince1970()
+    func testMillisecondsSince1970()
+    func testCustomFormat()
+    func testISO8601Format()
+}
+
+extension DateFormatAdapterTest {
+    
+    var referenceDate: Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
-        let date = dateFormatter.date(from: "10/25/1992")!
-        let timeInterval = date.timeIntervalSince1970
-        timeIntervalString = String(Int(timeInterval))
-    }
-    
-    override func tearDown() {
-        timeIntervalString = nil
-        super.tearDown()
+        return dateFormatter.date(from: "10/25/1992")!
     }
     
     func testSecondsSince1970() {
-        XCTAssertNotNil(timeIntervalString)
-        let convertedDateString = adapter.convert(timeIntervalString, fromFormat: .secondsSince1970, toFormat: .secondsSince1970)
+        XCTAssertNotNil(dateString)
+        let convertedDateString = adapter.convert(dateString, fromFormat: fromFormat, toFormat: .secondsSince1970)
         XCTAssertNotNil(convertedDateString)
-        XCTAssertEqual(convertedDateString!, timeIntervalString)
+        XCTAssertEqual(convertedDateString!, "\(Int(referenceDate.timeIntervalSince1970))")
     }
     
     func testMillisecondsSince1970() {
-        XCTAssertNotNil(timeIntervalString)
-        let convertedDateString = adapter.convert(timeIntervalString, fromFormat: .secondsSince1970, toFormat: .millisecondsSince1970)
+        XCTAssertNotNil(dateString)
+        let convertedDateString = adapter.convert(dateString, fromFormat: fromFormat, toFormat: .millisecondsSince1970)
         XCTAssertNotNil(convertedDateString)
-        XCTAssertEqual(convertedDateString!, "\(timeIntervalString!)000")
+        XCTAssertEqual(convertedDateString!, "\(Int(referenceDate.timeIntervalSince1970) * 1000)")
     }
     
     func testCustomFormat() {
-        XCTAssertNotNil(timeIntervalString)
-        let convertedDateString = adapter.convert(timeIntervalString, fromFormat: .secondsSince1970, toFormat: .custom(format: "MMM-dd-yyyy"))
+        XCTAssertNotNil(dateString)
+        let convertedDateString = adapter.convert(dateString, fromFormat: fromFormat, toFormat: .custom(format: "MMM-dd yy"))
         XCTAssertNotNil(convertedDateString)
-        XCTAssertEqual(convertedDateString!, "Oct-25-1992")
+        XCTAssertEqual(convertedDateString!, "Oct-25 92")
     }
     
-    //2017-08-02T03:33:19+0000
-    func test_iso8601Format() {
-        XCTAssertNotNil(timeIntervalString)
-        let convertedDateString = adapter.convert(timeIntervalString, fromFormat: .secondsSince1970, toFormat: .iso8601)
+    func testISO8601Format() {
+        XCTAssertNotNil(dateString)
+        let convertedDateString = adapter.convert(dateString, fromFormat: fromFormat, toFormat: .iso8601)
         XCTAssertNotNil(convertedDateString)
         XCTAssertEqual(convertedDateString!, "1992-10-25T07:00:00+0000")
+    }
+}
+
+class DateFormatAdapterSecondsSince1970Tests: XCTestCase, DateFormatAdapterTest {
+    
+    let adapter = DateFormatAdapter.shared
+    let fromFormat: JSONDateTransformer.DateFormat = .secondsSince1970
+    var dateString: String!
+    
+    override func setUp() {
+        super.setUp()
+        self.dateString = String(Int(referenceDate.timeIntervalSince1970))
+    }
+    
+    func testAll() {
+        testSecondsSince1970()
+        testMillisecondsSince1970()
+        testCustomFormat()
+        testISO8601Format()
+    }
+}
+
+class DateFormatAdapterMillisecondsSince1970Tests: XCTestCase, DateFormatAdapterTest {
+    
+    let adapter = DateFormatAdapter.shared
+    let fromFormat: JSONDateTransformer.DateFormat = .millisecondsSince1970
+    var dateString: String!
+    
+    override func setUp() {
+        super.setUp()
+        self.dateString = String(Int(referenceDate.timeIntervalSince1970) * 1000)
+    }
+    
+    func testAll() {
+        testSecondsSince1970()
+        testMillisecondsSince1970()
+        testCustomFormat()
+        testISO8601Format()
+    }
+}
+
+class DateFormatAdapterCustomFormatTests: XCTestCase, DateFormatAdapterTest {
+    
+    let adapter = DateFormatAdapter.shared
+    let fromFormat: JSONDateTransformer.DateFormat = .custom(format: "EEEE, MMM d, yyyy")
+    var dateString: String!
+    
+    override func setUp() {
+        super.setUp()
+        self.dateString = "Sunday, Oct 25, 1992"
+    }
+    
+    func testAll() {
+        testSecondsSince1970()
+        testMillisecondsSince1970()
+        testCustomFormat()
+        testISO8601Format()
+    }
+}
+
+class DateFormatAdapterISO8601Tests: XCTestCase, DateFormatAdapterTest {
+    
+    let adapter = DateFormatAdapter.shared
+    let fromFormat: JSONDateTransformer.DateFormat = .iso8601
+    var dateString: String!
+    
+    override func setUp() {
+        super.setUp()
+        self.dateString = "1992-10-25T07:00:00+0000"
+    }
+    
+    func testAll() {
+        testSecondsSince1970()
+        testMillisecondsSince1970()
+        testCustomFormat()
+        testISO8601Format()
     }
 }

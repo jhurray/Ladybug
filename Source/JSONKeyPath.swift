@@ -8,28 +8,10 @@
 
 import Foundation
 
-internal enum JSONSubscriptType {
-    case index(Int)
-    case key(String)
-}
-
 public protocol JSONSubscript {}
 
-internal protocol _JSONSubscript: JSONSubscript {
-    
-    var subscriptType: JSONSubscriptType { get }
-}
-
-extension Int: _JSONSubscript {
-    var subscriptType: JSONSubscriptType {
-        return .index(self)
-    }
-}
-extension String: _JSONSubscript {
-    var subscriptType: JSONSubscriptType {
-        return .key(self)
-    }
-}
+extension Int: JSONSubscript {}
+extension String: JSONSubscript {}
 
 public struct JSONKeyPath {
     
