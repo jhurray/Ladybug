@@ -10,6 +10,7 @@ import Foundation
 
 public protocol JSONCodable: Codable {
     
+    init(data: Data) throws
     init(json: Any) throws
     
     static var transformers: [JSONTransformer] { get }
@@ -20,6 +21,11 @@ public enum JSONCodableError: Swift.Error {
 }
 
 public extension Array where Element: JSONCodable {
+    
+    init(data: Data) throws {
+        let json = try JSONSerialization.jsonObject(with: data)
+        try self.init(json: json)
+    }
     
     init(json: Any) throws {
         guard let objectList = json as? [Any] else {
@@ -38,6 +44,11 @@ public extension Array where Element: JSONCodable {
 }
 
 public extension JSONCodable {
+    
+    init(data: Data) throws {
+        let json = try JSONSerialization.jsonObject(with: data)
+        try self.init(json: json)
+    }
     
     public init(json: Any) throws {
         guard var jsonDictionary = json as? [String: Any] else {

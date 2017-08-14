@@ -26,6 +26,23 @@ public struct JSONKeyPathTransformer: JSONTransformer {
     }
 }
 
+public struct JSONDefaultValueTransformer: JSONTransformer {
+    
+    public let propertyName: String
+    public let keyPath: JSONKeyPath
+    private let value: Any
+    
+    init(propertyName: String, value: Any) {
+        self.propertyName = propertyName
+        self.keyPath = JSONKeyPath(propertyName)
+        self.value = value
+    }
+    
+    public func transform(_ json: inout [String: Any]) {
+        json[propertyName] = value
+    }
+}
+
 public struct JSONNestedObjectTransformer: JSONTransformer {
     
     public let propertyName: String
@@ -82,8 +99,6 @@ public struct JSONNestedListTransformer: JSONTransformer {
     }
 }
 
-
-
 public struct JSONDateTransformer: JSONTransformer {
     
     public enum DateFormat: Hashable {
@@ -126,7 +141,7 @@ public struct JSONDateTransformer: JSONTransformer {
     public let propertyName: String
     public let keyPath: JSONKeyPath
     private let dateFormat: DateFormat
-    private let customAdapter: ((Any?) -> Date)?
+    private let customAdapter: ((Any?) -> Date?)?
     
     public init(propertyName: String, dateFormat: DateFormat) {
         let keyPath = JSONKeyPath(propertyName)
@@ -140,12 +155,12 @@ public struct JSONDateTransformer: JSONTransformer {
         self.customAdapter = nil
     }
     
-    public init(propertyName: String, customAdapter: @escaping (Any?) -> Date) {
+    public init(propertyName: String, customAdapter: @escaping (Any?) -> Date?) {
         let keyPath = JSONKeyPath(propertyName)
         self.init(propertyName: propertyName, keyPath: keyPath, customAdapter: customAdapter)
     }
     
-    public init(propertyName: String, keyPath: JSONKeyPath, customAdapter: @escaping (Any?) -> Date) {
+    public init(propertyName: String, keyPath: JSONKeyPath, customAdapter: @escaping (Any?) -> Date?) {
         self.propertyName = propertyName
         self.keyPath = keyPath
         self.dateFormat = .secondsSince1970
@@ -154,7 +169,11 @@ public struct JSONDateTransformer: JSONTransformer {
     
     public func transform(_ json: inout [String : Any]) {
         if let customAdapter = customAdapter {
-            let date = customAdapter(json[jsonKeyPath: keyPath])
+            guard let date = customAdapter(json[jsonKeyPath: keyPath]) else {
+                // If `date` is nil and the property being transformed is explicitly non-optional
+                // JSONDecoder will throw an error and initialization will fail
+                return
+            }
             let dateFormatter = DateFormat.millisecondsSince1970.dateFormatter
             json[propertyName] = Int(dateFormatter.string(from: date))
             return

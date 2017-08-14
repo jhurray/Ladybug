@@ -73,7 +73,7 @@ class JSONTransformerTests: XCTestCase {
     }
     
     func testCustomDateTransformer() {
-        let transformer = JSONDateTransformer(propertyName: "date", keyPath: JSONKeyPath("date_key")) { (object) -> Date in
+        let transformer = JSONDateTransformer(propertyName: "date", keyPath: JSONKeyPath("date_key")) { (object) -> Date? in
             guard let dateString = object as? String else {
                 return Date()
             }
@@ -93,5 +93,11 @@ class JSONTransformerTests: XCTestCase {
         XCTAssertEqual(JSONDateTransformer.DateFormat.millisecondsSince1970, JSONDateTransformer.DateFormat.millisecondsSince1970)
         XCTAssertEqual(JSONDateTransformer.DateFormat.iso8601, JSONDateTransformer.DateFormat.iso8601)
         XCTAssertEqual(JSONDateTransformer.DateFormat.custom(format: "ok kewl"), JSONDateTransformer.DateFormat.custom(format: "ok kewl"))
+    }
+    
+    func testDefaultValueTransformer() {
+        let value = 78
+        let transformer = JSONDefaultValueTransformer(propertyName: "defaultProperty", value: value)
+        testTransform(with: transformer, expectedValue: value)
     }
 }

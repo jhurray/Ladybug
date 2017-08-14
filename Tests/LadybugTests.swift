@@ -25,9 +25,20 @@ class LadybugTests: XCTestCase {
         super.tearDown()
     }
     
-    func testInit() {
+    func testInitWithJSON() {
         do {
             let person = try Person(json: json)
+            let pet = person.pet
+            XCTAssertNotNil(pet)
+        } catch let error {
+            XCTFail("Unsuccesful initialization: \(error)")
+        }
+    }
+    
+    func testInitWithData() {
+        do {
+            let data = Person.jsonString.data(using: .utf8)!
+            let person = try Person(data: data)
             let pet = person.pet
             XCTAssertNotNil(pet)
         } catch let error {

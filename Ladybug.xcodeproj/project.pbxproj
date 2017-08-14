@@ -31,6 +31,7 @@
 		26C272571F3BE0D8002537C5 /* CodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C272561F3BE0D8002537C5 /* CodableTests.swift */; };
 		26C272591F3BFC07002537C5 /* JSONKeyPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C272581F3BFC07002537C5 /* JSONKeyPathTests.swift */; };
 		26C2725B1F3C04EA002537C5 /* JSONTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C2725A1F3C04EA002537C5 /* JSONTransformerTests.swift */; };
+		26C2725D1F3C240A002537C5 /* ClassConformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C2725C1F3C240A002537C5 /* ClassConformanceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +63,7 @@
 		26C272561F3BE0D8002537C5 /* CodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableTests.swift; sourceTree = "<group>"; };
 		26C272581F3BFC07002537C5 /* JSONKeyPathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONKeyPathTests.swift; sourceTree = "<group>"; };
 		26C2725A1F3C04EA002537C5 /* JSONTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONTransformerTests.swift; sourceTree = "<group>"; };
+		26C2725C1F3C240A002537C5 /* ClassConformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassConformanceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 				26C272561F3BE0D8002537C5 /* CodableTests.swift */,
 				26C272581F3BFC07002537C5 /* JSONKeyPathTests.swift */,
 				26C2725A1F3C04EA002537C5 /* JSONTransformerTests.swift */,
+				26C2725C1F3C240A002537C5 /* ClassConformanceTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -392,6 +395,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26C272591F3BFC07002537C5 /* JSONKeyPathTests.swift in Sources */,
+				26C2725D1F3C240A002537C5 /* ClassConformanceTests.swift in Sources */,
 				26C272551F3165AD002537C5 /* DateFormatAdapterTests.swift in Sources */,
 				26AF159B1F2D866500D963FF /* Person.swift in Sources */,
 				26C272571F3BE0D8002537C5 /* CodableTests.swift in Sources */,
