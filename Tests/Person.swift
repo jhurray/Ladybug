@@ -77,12 +77,12 @@ struct Person: JSONCodable {
     """
     
     static let transformers: [JSONTransformer] = [
-        JSONNestedObjectTransformer(propertyName: "pet", keyPath: JSONKeyPath("pet_thing"), type: Pet.self),
+        JSONNestedObjectTransformer<Pet>(propertyName: "pet", keyPath: JSONKeyPath("pet_thing")),
         JSONKeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("full_name")),
         JSONKeyPathTransformer(propertyName: "petName", keyPath: JSONKeyPath("pet_thing", "name")),
         JSONDateTransformer(propertyName: "birthday", keyPath: JSONKeyPath("date_of_birth"), dateFormat: .custom(format: "MM/dd/yyyy")),
-        JSONNestedListTransformer(propertyName: "kids", type: Person.self),
-        JSONNestedObjectTransformer(propertyName: "favoritePet", keyPath: JSONKeyPath("pets", 1) , type: Pet.self),
+        JSONNestedListTransformer<Person>(propertyName: "kids"),
+        JSONNestedObjectTransformer<Pet>(propertyName: "favoritePet", keyPath: JSONKeyPath("pets", 1)),
     ]
     
     enum Gender: String, Codable {

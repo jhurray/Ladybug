@@ -31,59 +31,60 @@ public struct JSONDefaultValueTransformer: JSONTransformer {
     public let propertyName: String
     public let keyPath: JSONKeyPath
     private let value: Any
+    private let override: Bool
     
-    init(propertyName: String, value: Any) {
+    init(propertyName: String, value: Any, override: Bool = false) {
         self.propertyName = propertyName
         self.keyPath = JSONKeyPath(propertyName)
         self.value = value
+        self.override = override
     }
     
     public func transform(_ json: inout [String: Any]) {
+        guard json[propertyName] == nil || override else {
+            return
+        }
         json[propertyName] = value
     }
 }
 
-public struct JSONNestedObjectTransformer: JSONTransformer {
+public struct JSONNestedObjectTransformer<Type: JSONCodable>: JSONTransformer {
     
     public let propertyName: String
     public let keyPath: JSONKeyPath
-    private let type: JSONCodable.Type
     
-    public init(propertyName: String, type: JSONCodable.Type) {
+    public init(propertyName: String) {
         let keyPath = JSONKeyPath(propertyName)
-        self.init(propertyName: propertyName, keyPath: keyPath, type: type)
+        self.init(propertyName: propertyName, keyPath: keyPath)
     }
     
-    public init(propertyName: String, keyPath: JSONKeyPath, type: JSONCodable.Type) {
+    public init(propertyName: String, keyPath: JSONKeyPath) {
         self.propertyName = propertyName
         self.keyPath = keyPath
-        self.type = type
     }
 
     public func transform(_ json: inout [String: Any]) {
         guard var nestedJSON = json[jsonKeyPath: keyPath] as? [String: Any] else {
             return
         }
-        type.alter(&nestedJSON)
+        Type.alter(&nestedJSON)
         json[propertyName] = nestedJSON
     }
 }
 
-public struct JSONNestedListTransformer: JSONTransformer {
+public struct JSONNestedListTransformer<Type: JSONCodable>: JSONTransformer {
     
     public let propertyName: String
     public let keyPath: JSONKeyPath
-    private let type: JSONCodable.Type
     
-    public init(propertyName: String, type: JSONCodable.Type) {
+    public init(propertyName: String) {
         let keyPath = JSONKeyPath(propertyName)
-        self.init(propertyName: propertyName, keyPath: keyPath, type: type)
+        self.init(propertyName: propertyName, keyPath: keyPath)
     }
     
-    public init(propertyName: String, keyPath: JSONKeyPath, type: JSONCodable.Type) {
+    public init(propertyName: String, keyPath: JSONKeyPath) {
         self.propertyName = propertyName
         self.keyPath = keyPath
-        self.type = type
     }
     
     public func transform(_ json: inout [String: Any]) {
@@ -92,7 +93,7 @@ public struct JSONNestedListTransformer: JSONTransformer {
         }
         var alteredJSONList: [[String: Any]] = []
         for var nestedJSON in nestedJSONList {
-            type.alter(&nestedJSON)
+            Type.alter(&nestedJSON)
             alteredJSONList.append(nestedJSON)
         }
         json[propertyName] = alteredJSONList

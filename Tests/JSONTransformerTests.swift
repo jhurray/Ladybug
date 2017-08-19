@@ -53,12 +53,12 @@ class JSONTransformerTests: XCTestCase {
     }
     
     func testNestedObjectTransformer() {
-        let transformer = JSONNestedObjectTransformer(propertyName: "objectKey", keyPath: JSONKeyPath("object_key"), type: Dummy.self)
+        let transformer = JSONNestedObjectTransformer<Dummy>(propertyName: "objectKey", keyPath: JSONKeyPath("object_key"))
         testTransform(with: transformer, expectedValue: ["hello": "world"])
     }
     
     func testNestedListTransformer() {
-        let transformer = JSONNestedListTransformer(propertyName: "listKey", keyPath: JSONKeyPath("list_key"), type: Dummy.self)
+        let transformer = JSONNestedListTransformer<Dummy>(propertyName: "listKey", keyPath: JSONKeyPath("list_key"))
         let expectedValue = [["name": "john","age": 24], ["name": "jane", "age": 30]]
         testTransform(with: transformer, expectedValue: expectedValue)
     }

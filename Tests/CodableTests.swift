@@ -36,7 +36,7 @@ struct Tree: JSONCodable {
     let leaves: [Leaf]
     
     static let transformers: [JSONTransformer] = [
-        JSONNestedListTransformer(propertyName: "leaves", type: Leaf.self)
+        JSONNestedListTransformer<Leaf>(propertyName: "leaves")
     ]
     
     struct Leaf: JSONCodable {
