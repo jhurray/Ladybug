@@ -4,6 +4,11 @@ Ladybug makes it easy to write a simple model or data-model layer in Swift 4
 
 This framework is *modeled* (ha 👏 ha 👏) after [Mantle](https://github.com/Mantle/Mantle). Mantle provides easy translation from JSON to model objects, and also comes with [`NSCoding`](https://developer.apple.com/documentation/foundation/nscoding) conformance out of the box. Ladybug takes advantage of the new [`Codable`](https://developer.apple.com/documentation/swift/codable) protocol to provide similar functionality without subclassing `NSObject`.
 
+![language](https://img.shields.io/badge/Language-Swift 4-56A4D3.svg)
+![Version](https://img.shields.io/badge/Pod-%200.0.1%20-96281B.svg)
+![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg)
+![Platform](https://img.shields.io/badge/platform-%20iOS | tvOS | macOS | watchOS%20-lightgrey.svg)
+
 ### Quick Links
 * [Setup](#setup)
 * [Cocoapods & Carthage](#ingestion)
@@ -55,6 +60,21 @@ let forest = try Array<Tree>(json: [treeJSON, treeJSON, treeJSON])
 **Note:** Any nested enum must conform to `Codable` and `RawRepresentable` where the `RawValue` is `Codable`.
 
 ### Cocoapods & Carthage <a name="ingestion"></a>
+
+#### Cocoapods
+
+```ruby
+pod 'Ladybug', '~> 0.0.1'
+```
+Then add the following:
+
+```swift
+import Ladybug
+```
+
+#### Carthage
+
+Unfortunately Carthage will not build using the XCode9 beta due to [this issue](https://github.com/Carthage/Carthage/issues/2104). Once the bug is fixed, I will add Carthage support.
 
 
 ## Mapping JSON Keys to Properties <a name="json-to-property"></a>
