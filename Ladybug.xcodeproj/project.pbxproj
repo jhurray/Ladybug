@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		264615A21F49044C00789AB1 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 264615A11F49044C00789AB1 /* README.md */; };
+		264615A31F4906BC00789AB1 /* JSONTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C272521F3005EB002537C5 /* JSONTransformer.swift */; };
+		264615A41F4906BC00789AB1 /* JSONTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C272521F3005EB002537C5 /* JSONTransformer.swift */; };
+		264615A51F4906BD00789AB1 /* JSONTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C272521F3005EB002537C5 /* JSONTransformer.swift */; };
 		26AF15341F2D6E7300D963FF /* Ladybug.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26AF152A1F2D6E7300D963FF /* Ladybug.framework */; };
 		26AF15391F2D6E7300D963FF /* LadybugTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AF15381F2D6E7300D963FF /* LadybugTests.swift */; };
 		26AF153B1F2D6E7300D963FF /* Ladybug.h in Headers */ = {isa = PBXBuildFile; fileRef = 26AF152D1F2D6E7300D963FF /* Ladybug.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -45,6 +49,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		264615A11F49044C00789AB1 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		26AF152A1F2D6E7300D963FF /* Ladybug.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ladybug.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		26AF152D1F2D6E7300D963FF /* Ladybug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Ladybug.h; sourceTree = "<group>"; };
 		26AF152E1F2D6E7300D963FF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -109,6 +114,7 @@
 		26AF15201F2D6E7300D963FF = {
 			isa = PBXGroup;
 			children = (
+				264615A11F49044C00789AB1 /* README.md */,
 				26AF152C1F2D6E7300D963FF /* Frameworks */,
 				26AF152B1F2D6E7300D963FF /* Products */,
 				26AF15891F2D706200D963FF /* Source */,
@@ -345,6 +351,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				264615A21F49044C00789AB1 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -409,6 +416,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26AF15961F2D80BF00D963FF /* JSONKeyPath.swift in Sources */,
+				264615A31F4906BC00789AB1 /* JSONTransformer.swift in Sources */,
 				26AF15A31F2F0BB800D963FF /* DateFormatAdapter.swift in Sources */,
 				26AF158F1F2D71DC00D963FF /* JSONCodable.swift in Sources */,
 			);
@@ -419,6 +427,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26AF15971F2D80C000D963FF /* JSONKeyPath.swift in Sources */,
+				264615A41F4906BC00789AB1 /* JSONTransformer.swift in Sources */,
 				26AF15A41F2F0BB900D963FF /* DateFormatAdapter.swift in Sources */,
 				26AF15901F2D71DC00D963FF /* JSONCodable.swift in Sources */,
 			);
@@ -429,6 +438,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26AF15981F2D80C000D963FF /* JSONKeyPath.swift in Sources */,
+				264615A51F4906BD00789AB1 /* JSONTransformer.swift in Sources */,
 				26AF15A51F2F0BBA00D963FF /* DateFormatAdapter.swift in Sources */,
 				26AF15911F2D71DD00D963FF /* JSONCodable.swift in Sources */,
 			);
@@ -494,7 +504,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -548,7 +559,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -570,6 +582,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = Frameworks/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.guaranteed.Ladybug;
 				PRODUCT_NAME = Ladybug;
@@ -592,6 +605,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = Frameworks/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.guaranteed.Ladybug;
 				PRODUCT_NAME = Ladybug;
@@ -648,7 +662,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 4.0;
+				WATCHOS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Debug;
 		};
@@ -671,7 +685,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 4.0;
+				WATCHOS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Release;
 		};
@@ -693,7 +707,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 11.0;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
 			};
 			name = Debug;
 		};
@@ -715,7 +729,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 11.0;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
 			};
 			name = Release;
 		};
@@ -733,7 +747,7 @@
 				INFOPLIST_FILE = Frameworks/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.guaranteed.Ladybug-macOS";
 				PRODUCT_NAME = Ladybug;
 				SDKROOT = macosx;
@@ -756,7 +770,7 @@
 				INFOPLIST_FILE = Frameworks/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.guaranteed.Ladybug-macOS";
 				PRODUCT_NAME = Ladybug;
 				SDKROOT = macosx;
