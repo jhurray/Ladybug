@@ -264,16 +264,17 @@ Say you had a URL string passed through the JSON and you wanted to map that to a
 
 ```swift
 {
-"url": "https://mySite.com?query=fizz&param=buzz"
+"values": [1, 8, 9, 14, 6]
 }
 ... 
-struct Thing: JSONCodable {
-	let query: String
+struct Count: JSONCodable {
+	let values: [Int]
+	let sum: Int
 	
 	let transformers = [
-		JSONMapTransformer<String>(propertyName: "query") { value in
-			let url = URL(value as! String)
-			return url.query
+		JSONMapTransformer<Int>(propertyName: "sum", keyPath: JSONKeyPath("values")) { value in
+			let values = value as! [Int]
+			return values.reduce(0) { $0 + $1 }
 		}
 	]
 }
