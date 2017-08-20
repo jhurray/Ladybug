@@ -20,7 +20,7 @@ Ladybug takes the pain out of parsing JSON in Swift. It allows you to map JSON k
 `Codable` is a huge step for modeling data in swift, but if your JSON structure diverges from your model, conforming to `Codable` can be a **huge** pain 🤕. I elaborate on this [here](#why-not-codable).
 
 #### Setup <a name="setup"></a>
-By conforming to the `JSONCodable` protocol provided by 🐞, you can initialize any `struct` or `class` with `Data` or JSON, and get full `Codable` conformance.
+By conforming to the `JSONCodable` protocol provided by 🐞, you can initialize any `struct` or `class` with `Data` or JSON, and get full `Codable` conformance. If your JSON structure diverges form your data model, you can override the static `transformers` property to provide custom mapping.
 
 
 ```swift
@@ -33,10 +33,14 @@ struct Tree: JSONCodable {
     let name: String
     let family: Family
     let age: Int
+    
+    static transformers: [JSONTransformer] = [
+    	JSONKeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("key_path"))	
+    ]
 }
 ...
 let treeJSON = [
-  "name": "pine",
+  "tree_name": "pine",
   "age": "121",
   "family": 1
 ]
@@ -56,17 +60,7 @@ let forest = try Array<Tree>(json: [treeJSON, treeJSON, treeJSON])
 ## Mapping JSON Keys to Properties <a name="json-to-property"></a>
 Ok, it gets a little more complicated, but its easy, I swear. 
 
-What if our JSON looked like this:
-
-```json   
-{
-  "tree_name": "pine",
-  "age": 121,
-  "family": 1
-}
-```
-
-We need to map the `tree_name` key to the `name` property.
+In the example above we needed to map the `tree_name` key to the `name` property.
 
 You can associate JSON keys with properties via different objects conforming to `JSONTransformer`.
 
@@ -87,7 +81,7 @@ static var transformers: [JSONTransformer] { get }
 ### `JSONKeyPathTransformer`
 
 
-To solve the problem above, we would have to override `transformers` in our `Tree` object, and supply a key path transformer.
+To solve the problem in the first example, we overrode `transformers` in our `Tree` object, and supplied a key path transformer.
 
 ```swift
 struct Tree: JSONCodable {
@@ -116,7 +110,7 @@ In the example below:
 
 * `JSONKeyPath("foo")` maps to `{"hello": "world"}`
 * `JSONKeyPath("foo", "hello")` maps to `"world"`
-* `JSONKeyPath("bar", 1)` maps to `"ipsum"`
+* `JSONKeyPath("bar", 0)` maps to `"lorem"`
 
 ```json
 {
@@ -130,9 +124,14 @@ In the example below:
 }
 ```
 
-You can also use keypath notation from Objective-C. In that sense `JSONKeyPath("foo", "hello")` is the same as `JSONKeyPath("foo.hello")`
+**Note:** These key paths are used optionally in the rest of the transformers if the transformed property name does not match the json structure.
 
-These key paths are used optionally in the rest of the transformers if the transformed property name does not match the json structure.
+**Note:** JSONKeyPath can also be expressed as a string literal.
+> `JSONKeyPath("some_key", "some_other_key")` == `"some_key.some_other_key"`
+
+**Note:** You can also use keypath notation from Objective-C.
+> `JSONKeyPath("foo", "hello")` == `JSONKeyPath("foo.hello")`
+
 
 ### Nested Objects: `JSONNestedObjectTransformer` and `JSONNestedListTransformer`
 
@@ -142,7 +141,7 @@ Lets add a nested class, `Leaf`. Trees have leaves. Nice.
 {
   "tree_name": "pine",
   "age": 121,
-  "family": 1
+  "family": 1,
   "leaves": [
   	  {
   	  "size": "large",
@@ -225,7 +224,7 @@ struct SomeDates: JSONCodable {
 
 ### Default Values / Migrations: `JSONDefaultValueTransformer` <a name="default-values"></a>
 
-If you wish to supply a default value for an property, you can use the default transformer. Supply the property name, the deault value, and whether or not to override the property if the `propertyName` key exists in the JSON payload.
+If you wish to supply a default value for an property, you can use `JSONDefaultValueTransformer`. Supply the property name and the the default value. You can also control whether or not to override the property if the `propertyName` key exists in the JSON payload.
 
 ```swift
 init(propertyName: String, value: Any, override: Bool = false)
@@ -237,14 +236,14 @@ The default transformer is useful when API's change, and can help migration from
 ## Handling Failure
 
 ### Exceptions
-Ladybug is failure driven, and all initializers it makes public throw exceptions if they fail. There is a `JSONCodableError` type that Ladybug will throw if there is a typecasting error, and Ladybug will also throw exceptions from `JSONSerialization` and `JSONDecoder`.
+Ladybug is failure driven, and all `JSONCodable` initializers throw exceptions if they fail. There is a `JSONCodableError` type that Ladybug will throw if there is a typecasting error, and Ladybug will also throw exceptions from `JSONSerialization` and `JSONDecoder`.
 
 ### Optionals
-If a value is optional in your JSON payload, it should be optional in your model. Ladybug will only throw an exception if a key is missing and the property it is being mapped to is non-optional. Play it safe kids, use optionals.
+If a value is optional in your JSON payload, it should be optional in your data model. Ladybug will only throw an exception if a key is missing and the property it is being mapped to is non-optional. Play it safe kids, use optionals.
 
 ## Class Conformance to `JSONCodable`
 
-There is 1 caveat to keep in mind when you are conforming a `class` to `JSONCodable`. Because classes in swift dont come with baked in default initializers like structs do, you have to make sure properties are initialized. You can do this by supplying default values, or a default initializer that initializes these values.
+There is a small caveat to keep in mind when you are conforming a `class` to `JSONCodable`. Because classes in swift dont come with baked in default initializers like structs do, you have to make sure properties are initialized. You can do this by supplying default values, or a default initializer that initializes these values.
 
 You can see examples in [`ClassConformanceTests.swift`](https://github.com/jhurray/Ladybug/blob/master/Tests/ClassConformanceTests.swift).
 

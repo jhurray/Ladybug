@@ -35,6 +35,13 @@ public struct JSONKeyPath {
     }
 }
 
+extension JSONKeyPath: ExpressibleByStringLiteral {
+    
+    public init(stringLiteral value: StaticString) {
+        self = JSONKeyPath("\(value)")
+    }
+}
+
 internal extension Dictionary where Key: StringProtocol {
     
     subscript(jsonKeyPath keyPath: JSONKeyPath) -> Any? {
