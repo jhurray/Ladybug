@@ -8,25 +8,50 @@
 
 import Foundation
 
+/// A protocol that provides Codable conformance and supports initialization from JSON and JSON Data
 public protocol JSONCodable: Codable {
     
+    /**
+     Initialize an object with JSON Data
+     
+     - Parameter data: JSON Data that will be serialized and mapped to the conforming object
+     */
     init(data: Data) throws
+    
+    /**
+     Initialize an object with a JSON object
+     
+     - Parameter json: JSON object that will be mapped to the conforming object
+     */
     init(json: Any) throws
     
+    /// Supplies an array of transformers used to map JSON values to properties of the conforming object
     static var transformers: [JSONTransformer] { get }
 }
 
+/// Exception type thrown by objects conforming to JSONCodable
 public enum JSONCodableError: Swift.Error {
+    /// Thrown when an object conforming to JSONCodable expects a certain type, but receives another
     case badType(expectedType: Any.Type, receivedType: Any.Type)
 }
 
 public extension Array where Element: JSONCodable {
     
+    /**
+     Initialize an array of objects conforming to JSONCodable with JSON Data
+     
+     - Parameter data: JSON Data that will be serialized and mapped to the list of objects conforming to JSONCodable
+     */
     init(data: Data) throws {
         let json = try JSONSerialization.jsonObject(with: data)
         try self.init(json: json)
     }
     
+    /**
+     Initialize an array of objects conforming to JSONCodable with a JSON object
+     
+     - Parameter json: JSON object that will mapped to the list of objects conforming to JSONCodable
+     */
     init(json: Any) throws {
         guard let objectList = json as? [Any] else {
             throw JSONCodableError.badType(expectedType: [Any].self, receivedType: type(of: json))

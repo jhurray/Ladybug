@@ -8,13 +8,13 @@ This framework is *modeled* (ha 👏 ha 👏) after [Mantle](https://github.com/
 * [Setup](#setup)
 * [Cocoapods & Carthage](#ingestion)
 * [Mapping JSON to properties](#json-to-property)
-* [Nested objects](#nested-objecs)
-* [Dates](#dates)
-* [Default Values / Migration](#default-values)
-* [JSONKeyPath](#jsonkeypath)
+  * [Nested Objects](#nested-objecs)
+  * [Dates](#dates)
+  * [Default Values / Migration](#default-values)
+  * [JSONKeyPath](#jsonkeypath)
 * [Musings 🤔](#musings)
 
-## Why 🐞? 
+## Why use 🐞? 
 Ladybug takes the pain out of parsing JSON in Swift. It allows you to map JSON keys to properties of your model without having to worry about explicit types. 
 
 `Codable` is a huge step for modeling data in swift, but if your JSON structure diverges from your model, conforming to `Codable` can be a **huge** pain 🤕. I elaborate on this [here](#why-not-codable).
@@ -222,6 +222,8 @@ struct SomeDates: JSONCodable {
 }
 ```
 
+**Note:** If using `customAdapter` to map to a non-optional `Date`, returning `nil` will result in an error being thrown. 
+
 ### Default Values / Migrations: `JSONDefaultValueTransformer` <a name="default-values"></a>
 
 If you wish to supply a default value for an property, you can use `JSONDefaultValueTransformer`. Supply the property name and the the default value. You can also control whether or not to override the property if the `propertyName` key exists in the JSON payload.
@@ -252,6 +254,10 @@ You can see examples in [`ClassConformanceTests.swift`](https://github.com/jhurr
 ### Whats Wrong With `Codable`? <a name="why-not-codable"></a>
 
 As mentioned before, `Codable` is a great step towards simplifying JSON parsing in swift, but the O(n) boilerplate that has become a mainstay in swift JSON parsing still exists when using `Codable` (e.g. For every property your object has, you need to write 1 or more lines of code to map the json to said property). In Apple's documentation on [Encoding and Decoding Custom Types](https://developer.apple.com/documentation/foundation/archives_and_serialization/encoding_and_decoding_custom_types), you can see that as soon as JSON keys diverge from property keys, you have to write a ton of boilerplate code to get `Codable` conformance. Ladybug sidesteps this, and  does a lot fo this for you under the hood.
+
+### Would be great if `AnyKeyPath` conformed to `ExpressibleByStringLiteral`
+
+If Swift 4 key paths could be expressible by a string value, we could use that instead of `propertyName: String` in `JSONTransformer`. This would provide a safer interface.
 
 ### Why I didn't include `Map` transformers
 Say you had a URL string passed through the JSON and you wanted to map that to a string property that is just the query of the URL.

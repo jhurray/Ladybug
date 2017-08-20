@@ -8,15 +8,22 @@
 
 import Foundation
 
+/// Represents a valid type for subscripting JSON objects
 public protocol JSONSubscript {}
 
 extension Int: JSONSubscript {}
 extension String: JSONSubscript {}
 
+/// Used to subscript JSON objects
 public struct JSONKeyPath {
     
     fileprivate var segments: [JSONSubscript]
     
+    /**
+     Used to subscript JSON objects
+     
+     - Parameter keys: variadic list of String or Int that represent a JSON key path
+     */
     public init(_ keys: JSONSubscript...) {
         var segments: [JSONSubscript] = []
         keys.forEach {

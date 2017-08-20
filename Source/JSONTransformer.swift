@@ -8,14 +8,19 @@
 
 import Foundation
 
+/// A protocol that facilitates transforming of JSON objects. Used by objects conforming to JSONCodable
 public protocol JSONTransformer {
     
+    /// The string representation of the property to which the JSON value is being mapped
     var propertyName: String { get }
+    /// Key path that points to the JSON value that is being mapped
     var keyPath: JSONKeyPath { get }
     
+    // Alters a JSON object to prepare for decoding
     func transform(_ json: inout [String: Any])
 }
 
+/// Maps a JSON value at a given key path to a property of an object conforming to JSONCodoable
 public struct JSONKeyPathTransformer: JSONTransformer {
     
     public let propertyName: String
@@ -26,6 +31,7 @@ public struct JSONKeyPathTransformer: JSONTransformer {
     }
 }
 
+/// Supplies a default value for a given property. Can be used for Migrations and API changes.
 public struct JSONDefaultValueTransformer: JSONTransformer {
     
     public let propertyName: String
@@ -33,6 +39,13 @@ public struct JSONDefaultValueTransformer: JSONTransformer {
     private let value: Any
     private let override: Bool
     
+    /**
+     Supplies a default value for a given property
+     
+     - Parameter propertyName: The string representation of the property to which the json value is being mapped
+     - Parameter value: The default value that will be assigned to the property
+     - Parameter override: If a value exists at the `propertyName` key and override == true, the existing value will be replaced with value supplied
+     */
     init(propertyName: String, value: Any, override: Bool = false) {
         self.propertyName = propertyName
         self.keyPath = JSONKeyPath(propertyName)
@@ -48,16 +61,28 @@ public struct JSONDefaultValueTransformer: JSONTransformer {
     }
 }
 
+/// Maps a JSON object to a type conforming to JSONCodable
 public struct JSONNestedObjectTransformer<Type: JSONCodable>: JSONTransformer {
     
     public let propertyName: String
     public let keyPath: JSONKeyPath
     
+    /**
+     Maps the nested type to the given property of type `Type`
+     
+     - Parameter propertyName: the string representation of the property to which the json value is being mapped
+     */
     public init(propertyName: String) {
         let keyPath = JSONKeyPath(propertyName)
         self.init(propertyName: propertyName, keyPath: keyPath)
     }
     
+    /**
+     Maps the JSON value at the given key path to the given property of type `Type`
+     
+     - Parameter propertyName: The string representation of the property to which the json value is being mapped
+     - Parameter keyPath: Key path that points to the JSON value that is being mapped
+     */
     public init(propertyName: String, keyPath: JSONKeyPath) {
         self.propertyName = propertyName
         self.keyPath = keyPath
@@ -72,16 +97,28 @@ public struct JSONNestedObjectTransformer<Type: JSONCodable>: JSONTransformer {
     }
 }
 
+/// Maps a JSON array to an array of a type conforming to JSONCodable
 public struct JSONNestedListTransformer<Type: JSONCodable>: JSONTransformer {
     
     public let propertyName: String
     public let keyPath: JSONKeyPath
     
+    /**
+     Maps an array to the given property of type `[Type]`
+     
+     - Parameter propertyName: the string representation of the property to which the json array is being mapped
+     */
     public init(propertyName: String) {
         let keyPath = JSONKeyPath(propertyName)
         self.init(propertyName: propertyName, keyPath: keyPath)
     }
     
+    /**
+     Maps the JSON value at the given key path to the given property of type `[Type]`
+     
+     - Parameter propertyName: The string representation of the property to which the json array is being mapped
+     - Parameter keyPath: Key path that points to the JSON array that is being mapped
+     */
     public init(propertyName: String, keyPath: JSONKeyPath) {
         self.propertyName = propertyName
         self.keyPath = keyPath
@@ -100,8 +137,16 @@ public struct JSONNestedListTransformer<Type: JSONCodable>: JSONTransformer {
     }
 }
 
+/// Used to transform raw JSON values to Date objects
 public struct JSONDateTransformer: JSONTransformer {
     
+    /**
+     An enumerated type used to determine which format JSON dates are in.
+     * secondsSince1970
+     * millisecondsSince1970
+     * iso8601
+     * custom(format: String)
+    */
     public enum DateFormat: Hashable {
         /// Decode the `Date` as a UNIX timestamp from a JSON number.
         case secondsSince1970
@@ -144,11 +189,24 @@ public struct JSONDateTransformer: JSONTransformer {
     private let dateFormat: DateFormat
     private let customAdapter: ((Any?) -> Date?)?
     
+    /**
+     Used to transform raw JSON values in the given format to Date object
+     
+     - Parameter propertyName: The string representation of the property to which the json value is being mapped
+     - Parameter dateFormat: The expected format of the raw JSON value
+     */
     public init(propertyName: String, dateFormat: DateFormat) {
         let keyPath = JSONKeyPath(propertyName)
         self.init(propertyName: propertyName, keyPath: keyPath, dateFormat: dateFormat)
     }
     
+    /**
+     Used to transform raw JSON values in the given format to Date object
+     
+     - Parameter propertyName: The string representation of the property to which the json value is being mapped
+     - Parameter keyPath: Key path that points to the JSON value that is being mapped
+     - Parameter dateFormat: The expected format of the raw JSON value
+     */
     public init(propertyName: String, keyPath: JSONKeyPath, dateFormat: DateFormat) {
         self.propertyName = propertyName
         self.keyPath = keyPath
@@ -156,11 +214,24 @@ public struct JSONDateTransformer: JSONTransformer {
         self.customAdapter = nil
     }
     
+    /**
+     Used to transform raw JSON values in the given format to Date object
+     
+     - Parameter propertyName: The string representation of the property to which the json value is being mapped
+     - Parameter customAdapter: A closure that is passed the raw JSON value and returns a `Date` object
+     */
     public init(propertyName: String, customAdapter: @escaping (Any?) -> Date?) {
         let keyPath = JSONKeyPath(propertyName)
         self.init(propertyName: propertyName, keyPath: keyPath, customAdapter: customAdapter)
     }
     
+    /**
+     Used to transform raw JSON values in the given format to Date object
+     
+     - Parameter propertyName: The string representation of the property to which the json value is being mapped
+     - Parameter keyPath: Key path that points to the JSON value that is being mapped
+     - Parameter customAdapter: A closure that is passed the raw JSON value and returns a `Date` object
+     */
     public init(propertyName: String, keyPath: JSONKeyPath, customAdapter: @escaping (Any?) -> Date?) {
         self.propertyName = propertyName
         self.keyPath = keyPath
