@@ -15,7 +15,7 @@ This framework is *modeled* (ha 👏 ha 👏) after [Mantle](https://github.com/
 * [Mapping JSON to properties](#json-to-property)
   * [Nested Objects](#nested-objecs)
   * [Dates](#dates)
-  * [Mapping JSON Values](#mapping)
+  * [Mapping](#mapping)
   * [Default Values / Migration](#default-values)
   * [JSONKeyPath](#jsonkeypath)
 * [Musings 🤔](#musings)
@@ -25,7 +25,7 @@ Ladybug takes the pain out of parsing JSON in Swift. It allows you to map JSON k
 
 `Codable` is a huge step for modeling data in swift, but if your JSON structure diverges from your model, conforming to `Codable` can be a **huge** pain 🤕. I elaborate on this [here](#why-not-codable).
 
-#### Setup <a name="setup"></a>
+### Setup <a name="setup"></a>
 By conforming to the `JSONCodable` protocol provided by 🐞, you can initialize any `struct` or `class` with `Data` or JSON, and get full `Codable` conformance. If your JSON structure diverges form your data model, you can override the static `transformers` property to provide custom mapping.
 
 
@@ -40,7 +40,7 @@ struct Tree: JSONCodable {
     let family: Family
     let age: Int
     
-    static transformers: [JSONTransformer] = [
+    static let transformers: [JSONTransformer] = [
     	KeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("tree_name"))	
     ]
 }
