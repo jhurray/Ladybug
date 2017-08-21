@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name             = 'Ladybug'
-    spec.version          = '0.0.1'
+    spec.version          = '0.0.2'
     spec.license          = { :type => 'MIT' }
     spec.homepage         = 'https://github.com/jhurray/Ladybug'
     spec.authors          = { 'Jeff Hurray' => 'jhurray33@gmail.com' }
