@@ -296,6 +296,13 @@ You can see examples in [`ClassConformanceTests.swift`](https://github.com/jhurr
 
 As mentioned before, `Codable` is a great step towards simplifying JSON parsing in swift, but the O(n) boilerplate that has become a mainstay in swift JSON parsing still exists when using `Codable` (e.g. For every property your object has, you need to write 1 or more lines of code to map the json to said property). In Apple's documentation on [Encoding and Decoding Custom Types](https://developer.apple.com/documentation/foundation/archives_and_serialization/encoding_and_decoding_custom_types), you can see that as soon as JSON keys diverge from property keys, you have to write a ton of boilerplate code to get `Codable` conformance. Ladybug sidesteps this, and  does a lot fo this for you under the hood.
 
+### Performance
+Ladybugs decoding and mapping performance is about the same as the performance of `JSONDecoder`. The transformers are very lightweight, but obviously as the number of transformers per model increases, the perfomace degrades at a linear rate. Just keep in mind that the closer your JSON schema is to your model schema, the more performant it will be.
+
+```
+performance = (JSONDecoder performance) + (Ladybug transformer performance)
+```
+
 ### It would be pretty great if `AnyKeyPath` conformed to `ExpressibleByStringLiteral`
 
 If Swift 4 key paths could be expressible by a string value, we could use that instead of `propertyName: String` in `JSONTransformer`. This would provide a safer interface.
