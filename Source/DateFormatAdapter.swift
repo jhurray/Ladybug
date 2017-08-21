@@ -54,7 +54,7 @@ fileprivate final class TimestampDateFormatter: DateFormatterProtocol {
 
 extension DateFormatter: DateFormatterProtocol {}
 
-internal extension JSONDateTransformer.DateFormat {
+internal extension DateTransformer.DateFormat {
     
     internal var dateFormatter: DateFormatterProtocol {
         switch self {
@@ -81,9 +81,9 @@ internal final class DateFormatAdapter {
     
     static let shared: DateFormatAdapter = DateFormatAdapter()
     
-    private var storage: [JSONDateTransformer.DateFormat: DateFormatterProtocol] = [:]
+    private var storage: [DateTransformer.DateFormat: DateFormatterProtocol] = [:]
     
-    func convert(_ dateString: String, fromFormat: JSONDateTransformer.DateFormat, toFormat: JSONDateTransformer.DateFormat) -> String? {
+    func convert(_ dateString: String, fromFormat: DateTransformer.DateFormat, toFormat: DateTransformer.DateFormat) -> String? {
         
         guard let date = storage[fromFormat, default: fromFormat.dateFormatter].date(from: dateString) else {
             return nil

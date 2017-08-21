@@ -21,10 +21,15 @@ public protocol JSONTransformer {
 }
 
 /// Maps a JSON value at a given key path to a property of an object conforming to JSONCodoable
-public struct JSONKeyPathTransformer: JSONTransformer {
+public struct KeyPathTransformer: JSONTransformer {
     
     public let propertyName: String
     public let keyPath: JSONKeyPath
+    
+    public init(propertyName: String, keyPath: JSONKeyPath) {
+        self.propertyName = propertyName
+        self.keyPath = keyPath
+    }
     
     public func transform(_ json: inout [String: Any]) {
         json[propertyName] = json[jsonKeyPath: keyPath]
@@ -32,7 +37,7 @@ public struct JSONKeyPathTransformer: JSONTransformer {
 }
 
 /// Supplies a default value for a given property. Can be used for Migrations and API changes.
-public struct JSONDefaultValueTransformer: JSONTransformer {
+public struct DefaultValueTransformer: JSONTransformer {
     
     public let propertyName: String
     public let keyPath: JSONKeyPath
@@ -62,7 +67,7 @@ public struct JSONDefaultValueTransformer: JSONTransformer {
 }
 
 /// Maps a JSON object to a type conforming to JSONCodable
-public struct JSONNestedObjectTransformer<Type: JSONCodable>: JSONTransformer {
+public struct NestedObjectTransformer<Type: JSONCodable>: JSONTransformer {
     
     public let propertyName: String
     public let keyPath: JSONKeyPath
@@ -98,7 +103,7 @@ public struct JSONNestedObjectTransformer<Type: JSONCodable>: JSONTransformer {
 }
 
 /// Maps a JSON array to an array of a type conforming to JSONCodable
-public struct JSONNestedListTransformer<Type: JSONCodable>: JSONTransformer {
+public struct NestedListTransformer<Type: JSONCodable>: JSONTransformer {
     
     public let propertyName: String
     public let keyPath: JSONKeyPath
@@ -137,8 +142,45 @@ public struct JSONNestedListTransformer<Type: JSONCodable>: JSONTransformer {
     }
 }
 
+/// Used to map JSON values to a Codable property of type `MappedToType`
+public struct MapTransformer<MappedToType: Codable>: JSONTransformer {
+    
+    public let propertyName: String
+    public let keyPath: JSONKeyPath
+    private let map: (Any?) -> MappedToType?
+    
+    /**
+     Used to map JSON values to a Codable property of type `MappedToType`
+     
+     - Parameter propertyName: The string representation of the property to which the JSON value is being mapped
+     - Parameter map: A closure that transforms the JSON value to a value of type `MappedToType`
+     */
+    public init(propertyName: String, map: @escaping (Any?) -> MappedToType?) {
+        self.init(propertyName: propertyName, keyPath: JSONKeyPath(propertyName), map: map)
+    }
+    
+    /**
+     Used to map JSON values to a Codable property of type `MappedToType`
+     
+     - Parameter propertyName: The string representation of the property to which the JSON value is being mapped
+     - Parameter keyPath: Key path that points to the JSON value that is being mapped
+     - Parameter map: A closure that transforms the JSON value to a value of type `MappedToType`
+     */
+    public init(propertyName: String, keyPath: JSONKeyPath, map: @escaping (Any?) -> MappedToType?) {
+        self.propertyName = propertyName
+        self.keyPath = keyPath
+        self.map = map
+    }
+    
+    public func transform(_ json: inout [String: Any]) {
+        if let mappedValue = map(json[jsonKeyPath: keyPath]) {
+            json[propertyName] = mappedValue
+        }
+    }
+}
+
 /// Used to transform raw JSON values to Date objects
-public struct JSONDateTransformer: JSONTransformer {
+public struct DateTransformer: JSONTransformer {
     
     /**
      An enumerated type used to determine which format JSON dates are in.

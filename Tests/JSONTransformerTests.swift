@@ -26,7 +26,8 @@ class JSONTransformerTests: XCTestCase {
         "object_key": [
             "hello": "world"
         ],
-        "date_key": "Sunday, Oct 25, 1992"
+        "date_key": "Sunday, Oct 25, 1992",
+        "map_key": "4"
     ]
     
     let formatString = "EEEE, MMM d, yyyy"
@@ -40,7 +41,7 @@ class JSONTransformerTests: XCTestCase {
         XCTAssertEqual(String(describing: jsonDictionary[jsonKeyPath: transformer.keyPath]!), String(describing: expectedValue))
     }
     
-    func testTransformDate(with transformer: JSONDateTransformer, expectedDate: Date) {
+    func testTransformDate(with transformer: DateTransformer, expectedDate: Date) {
         var jsonDictionary = self.jsonDictionary
         transformer.transform(&jsonDictionary)
         let secondsSince1970 = TimeInterval(jsonDictionary[transformer.propertyName] as! Int / 1000)
@@ -48,24 +49,24 @@ class JSONTransformerTests: XCTestCase {
     }
     
     func testKeyPathTransformer() {
-        let transformer = JSONKeyPathTransformer(propertyName: "myKey", keyPath: JSONKeyPath("key"))
+        let transformer = KeyPathTransformer(propertyName: "myKey", keyPath: JSONKeyPath("key"))
         testTransform(with: transformer, expectedValue: "value")
     }
     
     func testNestedObjectTransformer() {
-        let transformer = JSONNestedObjectTransformer<Dummy>(propertyName: "objectKey", keyPath: JSONKeyPath("object_key"))
+        let transformer = NestedObjectTransformer<Dummy>(propertyName: "objectKey", keyPath: JSONKeyPath("object_key"))
         testTransform(with: transformer, expectedValue: ["hello": "world"])
     }
     
     func testNestedListTransformer() {
-        let transformer = JSONNestedListTransformer<Dummy>(propertyName: "listKey", keyPath: JSONKeyPath("list_key"))
+        let transformer = NestedListTransformer<Dummy>(propertyName: "listKey", keyPath: JSONKeyPath("list_key"))
         let expectedValue = [["name": "john","age": 24], ["name": "jane", "age": 30]]
         testTransform(with: transformer, expectedValue: expectedValue)
     }
     
     func testDateTransformer() {
-        let format = JSONDateTransformer.DateFormat.custom(format: formatString)
-        let transformer = JSONDateTransformer(propertyName: "date", keyPath: JSONKeyPath("date_key"), dateFormat: format)
+        let format = DateTransformer.DateFormat.custom(format: formatString)
+        let transformer = DateTransformer(propertyName: "date", keyPath: JSONKeyPath("date_key"), dateFormat: format)
         let formatter = DateFormatter()
         formatter.dateFormat = formatString
         let date = formatter.date(from: jsonDictionary["date_key"] as! String)
@@ -73,7 +74,7 @@ class JSONTransformerTests: XCTestCase {
     }
     
     func testCustomDateTransformer() {
-        let transformer = JSONDateTransformer(propertyName: "date", keyPath: JSONKeyPath("date_key")) { (object) -> Date? in
+        let transformer = DateTransformer(propertyName: "date", keyPath: JSONKeyPath("date_key")) { (object) -> Date? in
             guard let dateString = object as? String else {
                 return Date()
             }
@@ -89,15 +90,22 @@ class JSONTransformerTests: XCTestCase {
     }
     
     func testDateFormats() {
-        XCTAssertEqual(JSONDateTransformer.DateFormat.secondsSince1970, JSONDateTransformer.DateFormat.secondsSince1970)
-        XCTAssertEqual(JSONDateTransformer.DateFormat.millisecondsSince1970, JSONDateTransformer.DateFormat.millisecondsSince1970)
-        XCTAssertEqual(JSONDateTransformer.DateFormat.iso8601, JSONDateTransformer.DateFormat.iso8601)
-        XCTAssertEqual(JSONDateTransformer.DateFormat.custom(format: "ok kewl"), JSONDateTransformer.DateFormat.custom(format: "ok kewl"))
+        XCTAssertEqual(DateTransformer.DateFormat.secondsSince1970, DateTransformer.DateFormat.secondsSince1970)
+        XCTAssertEqual(DateTransformer.DateFormat.millisecondsSince1970, DateTransformer.DateFormat.millisecondsSince1970)
+        XCTAssertEqual(DateTransformer.DateFormat.iso8601, DateTransformer.DateFormat.iso8601)
+        XCTAssertEqual(DateTransformer.DateFormat.custom(format: "ok kewl"), DateTransformer.DateFormat.custom(format: "ok kewl"))
     }
     
     func testDefaultValueTransformer() {
         let value = 78
-        let transformer = JSONDefaultValueTransformer(propertyName: "defaultProperty", value: value)
+        let transformer = DefaultValueTransformer(propertyName: "defaultProperty", value: value)
         testTransform(with: transformer, expectedValue: value)
+    }
+    
+    func testMapTransformer() {
+        let transformer = MapTransformer<Int>(propertyName:"mapKey", keyPath: "map_key") { value in
+            return Int(value as! String)
+        }
+        testTransform(with: transformer, expectedValue: 4)
     }
 }

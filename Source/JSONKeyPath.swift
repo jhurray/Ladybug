@@ -49,7 +49,7 @@ extension JSONKeyPath: ExpressibleByStringLiteral {
     }
 }
 
-internal extension Dictionary where Key: StringProtocol {
+public extension Dictionary where Key: StringProtocol {
     
     subscript(jsonKeyPath keyPath: JSONKeyPath) -> Any? {
         var value: Any? = self

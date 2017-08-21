@@ -36,7 +36,7 @@ struct Tree: JSONCodable {
     let leaves: [Leaf]
     
     static let transformers: [JSONTransformer] = [
-        JSONNestedListTransformer<Leaf>(propertyName: "leaves")
+        NestedListTransformer<Leaf>(propertyName: "leaves")
     ]
     
     struct Leaf: JSONCodable {
@@ -49,7 +49,7 @@ struct Tree: JSONCodable {
         let isAttached: Bool
         
         static let transformers: [JSONTransformer] = [
-            JSONKeyPathTransformer(propertyName: "isAttached", keyPath: JSONKeyPath("is_attached")),
+            KeyPathTransformer(propertyName: "isAttached", keyPath: JSONKeyPath("is_attached")),
         ]
     }
 }

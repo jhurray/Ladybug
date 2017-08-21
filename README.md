@@ -279,8 +279,9 @@ As mentioned before, `Codable` is a great step towards simplifying JSON parsing 
 
 If Swift 4 key paths could be expressible by a string value, we could use that instead of `propertyName: String` in `JSONTransformer`. This would provide a safer interface.
 
-### Why I didn't include `Map` transformers
-Say you had a URL string passed through the JSON and you wanted to map that to a string property that is just the query of the URL.
+### Be careful with `MapTransformer`
+
+Its easy to go a little to far with `MapTransformer`. In the example below, the map transformer is being used to calculate a sum instead of mapping a JSON value to a `Codable` type. To me, this promotes bad data modeling. I'm a firm believer that data models should closely mirror JSON responses. When used in the wrong way, map transformers can give too data models too much responsibility.
 
 ```swift
 {
@@ -292,17 +293,13 @@ struct Count: JSONCodable {
 	let sum: Int
 	
 	let transformers = [
-		JSONMapTransformer<Int>(propertyName: "sum", keyPath: JSONKeyPath("values")) { value in
+		MapTransformer<Int>(propertyName: "sum", keyPath: JSONKeyPath("values")) { value in
 			let values = value as! [Int]
 			return values.reduce(0) { $0 + $1 }
 		}
 	]
 }
 ```
-
-To me, this promotes bad data modeling. I'm a firm believer that data models should closely mirror JSON responses, and map transformers would give too data models too much responsibility.
-
-That being said, if you want the functionality of `JSONMapTransformer`, you can create an object that conforms to [`JSONTransformer`](https://github.com/jhurray/Ladybug/blob/master/Source/JSONTransformer.swift).
 
 ### Things I would like to do:   
 - [ ] Test Performance [Here](https://github.com/bwhiteley/JSONShootout)
