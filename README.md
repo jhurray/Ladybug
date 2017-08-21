@@ -15,6 +15,7 @@ This framework is *modeled* (ha 👏 ha 👏) after [Mantle](https://github.com/
 * [Mapping JSON to properties](#json-to-property)
   * [Nested Objects](#nested-objecs)
   * [Dates](#dates)
+  * [Mapping JSON Values](#mapping)
   * [Default Values / Migration](#default-values)
   * [JSONKeyPath](#jsonkeypath)
 * [Musings 🤔](#musings)
@@ -40,7 +41,7 @@ struct Tree: JSONCodable {
     let age: Int
     
     static transformers: [JSONTransformer] = [
-    	JSONKeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("tree_name"))	
+    	KeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("tree_name"))	
     ]
 }
 ...
@@ -86,11 +87,11 @@ You can associate JSON keys with properties via different objects conforming to 
 
 There are 5 types of transformers provided:    
 
-* `JSONKeyPathTransformer` (mapping key paths to property names)
-* `JSONNestedObjectTransformer<T: JSONCodable>` (explicitly declaring nested types)
-* `JSONNestedListTransformer<T: JSONCodable>` (explicitly declaring nested list)
-* `JSONDateTransformer` (handling dates in different formats)
-* `JSONDefaultValueTransformer` (assigning default values to properties)
+* `KeyPathTransformer` (mapping key paths to property names)
+* `NestedObjectTransformer<T: JSONCodable>` (explicitly declaring nested types)
+* `NestedListTransformer<T: JSONCodable>` (explicitly declaring nested list)
+* `DateTransformer` (handling dates in different formats)
+* `DefaultValueTransformer` (assigning default values to properties)
 
 Transformers are provided via a readonly `static` property of the `JSONCodable` protocol.
 
@@ -98,7 +99,7 @@ Transformers are provided via a readonly `static` property of the `JSONCodable` 
 static var transformers: [JSONTransformer] { get }
 ```
 
-### `JSONKeyPathTransformer`
+### `KeyPathTransformer`
 
 
 To solve the problem in the first example, we overrode `transformers` in our `Tree` object, and supplied a key path transformer.
@@ -115,7 +116,7 @@ struct Tree: JSONCodable {
     let age: Int
     
     static let transformers: [JSONTransformer] = [
-    	JSONKeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("tree_name"))
+    	KeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("tree_name"))
     ]
 }
 ```
@@ -153,7 +154,7 @@ In the example below:
 > `JSONKeyPath("foo", "hello")` == `JSONKeyPath("foo.hello")`
 
 
-### Nested Objects: `JSONNestedObjectTransformer` and `JSONNestedListTransformer`
+### Nested Objects: `NestedObjectTransformer` and `NestedListTransformer`
 
 Lets add a nested class, `Leaf`. Trees have leaves. Nice.
 
@@ -184,8 +185,8 @@ struct Tree: JSONCodable {
     ...
     static let transformers: [JSONTransformer] = [
     	...
-    	JSONNestedListTransformer<Leaf>(propertyName: "leaves"),
-    	JSONNestedObjectTransformer<Leaf>(propertyName: "firstLeaf", keyPath: JSONKeyPath("leaves", 0))
+    	NestedListTransformer<Leaf>(propertyName: "leaves"),
+    	NestedObjectTransformer<Leaf>(propertyName: "firstLeaf", keyPath: JSONKeyPath("leaves", 0))
     ]
     
     struct Leaf: JSONCodable {
@@ -194,13 +195,13 @@ struct Tree: JSONCodable {
 }
 ```
 
-Use `JSONNestedObjectTransformer` to map JSON objects to types conforming to `JSONCodable`. Likewise use `JSONNestedListTransformer` to map lists of JSON  objects to a list of objects conforming to `JSONCodable`.
+Use `NestedObjectTransformer` to map JSON objects to types conforming to `JSONCodable`. Likewise use `NestedListTransformer` to map lists of JSON  objects to a list of objects conforming to `JSONCodable`.
 
 **Note:** If the property name is the same as the key path, you dont need to include the key path.
 
-### Dates: `JSONDateTransformer`
+### Dates: `DateTransformer`
 
-Finally, lets add dates to the mix. You can use `JSONDateTransformer` to map formatted date strings, ints, or doubles from JSON to `Date` objects.
+Finally, lets add dates to the mix. You can use `DateTransformer` to map formatted date strings, ints, or doubles from JSON to `Date` objects.
 
 Ladybug supports multiple date parsing formats:
 
@@ -233,9 +234,9 @@ struct SomeDates: JSONCodable {
     let createdAt: Date
     
     static let transformers: [JSONTransformer] = [
-        JSONDateTransformer(propertyName: "july4th", dateFormat: .custom(format: "MM/dd/yyyy")),
-        JSONDateTransformer(propertyName: "Y2K", dateFormat: .secondsSince1970),
-        JSONDateTransformer(propertyName: "createdAt", customAdapter: { (_) -> Date? in
+        DateTransformer(propertyName: "july4th", dateFormat: .custom(format: "MM/dd/yyyy")),
+        DateTransformer(propertyName: "Y2K", dateFormat: .secondsSince1970),
+        DateTransformer(propertyName: "createdAt", customAdapter: { (_) -> Date? in
             return Date()
         })
     ]
@@ -244,9 +245,29 @@ struct SomeDates: JSONCodable {
 
 **Note:** If using `customAdapter` to map to a non-optional `Date`, returning `nil` will result in an error being thrown. 
 
-### Default Values / Migrations: `JSONDefaultValueTransformer` <a name="default-values"></a>
+### Mapping JSON Values: `MapTransformer` <a name="mapping"></a>
 
-If you wish to supply a default value for an property, you can use `JSONDefaultValueTransformer`. Supply the property name and the the default value. You can also control whether or not to override the property if the `propertyName` key exists in the JSON payload.
+If you need to provide a simple mapping from a JSON value to a property, use `MapTransformer`. A great example is using this to convert a string to an integer.
+
+```swift
+{
+"count": "100"
+}
+...
+struct Object: JSONCodable {
+    let count: Int
+    
+    static let transformers: [JSONTransformer] = [
+    	MapTransformer<Int>(propertyName: "count") {
+    		return Int($0 as! String)
+    	}
+    ]
+}
+``` 
+
+### Default Values / Migrations: `DefaultValueTransformer` <a name="default-values"></a>
+
+If you wish to supply a default value for an property, you can use `DefaultValueTransformer`. Supply the property name and the the default value. You can also control whether or not to override the property if the `propertyName` key exists in the JSON payload.
 
 ```swift
 init(propertyName: String, value: Any, override: Bool = false)
