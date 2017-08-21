@@ -320,7 +320,7 @@ struct Count: JSONCodable {
 	let values: [Int]
 	let sum: Int
 	
-	let transformers = [
+	static let transformers = [
 		MapTransformer<Int>(propertyName: "sum", keyPath: JSONKeyPath("values")) { value in
 			let values = value as! [Int]
 			return values.reduce(0) { $0 + $1 }
@@ -330,7 +330,6 @@ struct Count: JSONCodable {
 ```
 
 ### Things I would like to do:   
-- [ ] Test Performance [Here](https://github.com/bwhiteley/JSONShootout)
 - [ ] Custom rules: Provide a simple interface to say by default, map **under_scored** JSON keys to **camelCased** properties.
 
 
