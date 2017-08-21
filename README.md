@@ -65,7 +65,7 @@ let forest = try Array<Tree>(json: [treeJSON, treeJSON, treeJSON])
 #### Cocoapods
 
 ```ruby
-pod 'Ladybug', '~> 0.0.1'
+pod 'Ladybug', '~> 0.0.2'
 ```
 Then add the following:
 
