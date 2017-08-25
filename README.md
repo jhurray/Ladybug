@@ -47,7 +47,7 @@ struct Tree: JSONCodable {
 ...
 let treeJSON = [
   "tree_name": "pine",
-  "age": "121",
+  "age": 121,
   "family": 1
 ]
 ...
