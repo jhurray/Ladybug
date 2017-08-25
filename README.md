@@ -15,7 +15,7 @@ This framework is *modeled* (ha 👏 ha 👏) after [Mantle](https://github.com/
 * [Mapping JSON to properties](#json-to-property)
   * [Nested Objects](#nested-objecs)
   * [Dates](#dates)
-  * [Mapping](#mapping)
+  * [Additional Mapping](#mapping)
   * [Default Values / Migration](#default-values)
   * [JSONKeyPath](#jsonkeypath)
 * [Musings 🤔](#musings)
@@ -85,12 +85,13 @@ In the example above we needed to map the `tree_name` key to the `name` property
 
 You can associate JSON keys with properties via different objects conforming to `JSONTransformer`.
 
-There are 5 types of transformers provided:    
+There are 6 types of transformers provided:    
 
 * `KeyPathTransformer` (mapping key paths to property names)
 * `NestedObjectTransformer<T: JSONCodable>` (explicitly declaring nested types)
 * `NestedListTransformer<T: JSONCodable>` (explicitly declaring nested list)
 * `DateTransformer` (handling dates in different formats)
+* `MapTransformer<T: Codable>` (handling JSON values that require further mapping)
 * `DefaultValueTransformer` (assigning default values to properties)
 
 Transformers are provided via a readonly `static` property of the `JSONCodable` protocol.
@@ -245,7 +246,7 @@ struct SomeDates: JSONCodable {
 
 **Note:** If using `customAdapter` to map to a non-optional `Date`, returning `nil` will result in an error being thrown. 
 
-### Mapping JSON Values: `MapTransformer` <a name="mapping"></a>
+### Additional Mapping: `MapTransformer` <a name="mapping"></a>
 
 If you need to provide a simple mapping from a JSON value to a property, use `MapTransformer`. A great example is using this to convert a string to an integer.
 
