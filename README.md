@@ -274,6 +274,18 @@ You can see examples in [`ClassConformanceTests.swift`](https://github.com/jhurr
 
 ## Thoughts About 🐞 <a name="musings"></a>
 
+### It would be pretty great if `AnyKeyPath` could generate a string for its associated property
+
+If Swift 4 key paths exposed a string value, we could use `PartialKeyPath<Self>` as our `PropertyKey` typealias instead of `String`. This would be a much safer alternative.
+
+```swift
+ typealias PropertyKey = PartialKeyPath<Self>
+...
+static var transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
+	\Tree.name: JSONKeyPath("tree_name") 
+]
+```
+
 ### Whats wrong with `Codable`? <a name="why-not-codable"></a>
 
 As mentioned before, `Codable` is a great step towards simplifying JSON parsing in swift, but the O(n) boilerplate that has become a mainstay in swift JSON parsing still exists when using `Codable` (e.g. For every property your object has, you need to write 1 or more lines of code to map the json to said property). In Apple's documentation on [Encoding and Decoding Custom Types](https://developer.apple.com/documentation/foundation/archives_and_serialization/encoding_and_decoding_custom_types), you can see that as soon as JSON keys diverge from property keys, you have to write a ton of boilerplate code to get `Codable` conformance. Ladybug sidesteps this, and  does a lot of this for you under the hood.
@@ -284,10 +296,6 @@ Ladybugs decoding and mapping performance is about the same as the performance o
 ```
 performance = (JSONDecoder performance) + (Ladybug transformer performance)
 ```
-
-### It would be pretty great if `AnyKeyPath` conformed to `ExpressibleByStringLiteral`
-
-If Swift 4 key paths could be expressible by a string value, we could use that as our `PropertyKey` typealias instead of `String`. This would be a safer alternative.
 
 ### Be careful with `MapTransformer`
 
