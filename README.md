@@ -242,9 +242,7 @@ struct Object: JSONCodable {
     let count: Int
     
     static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
-    	"count": MapTransformer<Int> {
-    		return Int($0 as! String)
-    	}
+    	"count": MapTransformer<Int> { return Int($0 as! String) }
     ]
 }
 ``` 
@@ -305,7 +303,7 @@ struct Count: JSONCodable {
 	let sum: Int
 	
 	static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
-		MapTransformer<Int>(keyPath: "values") { value in
+		"sum": MapTransformer<Int>(keyPath: "values") { value in
 			let values = value as! [Int]
 			return values.reduce(0) { $0 + $1 }
 		}
@@ -316,7 +314,7 @@ struct Count: JSONCodable {
 ### Things I would like to do:   
 - [ ] Custom rules: Provide a simple interface to say by default, map **under_scored** JSON keys to **camelCased** properties.
 
-### Why is this called Ladybug?
+#### Why is this called Ladybug?
 
 Ask [Billy](https://twitter.com/billy_the_kid), or file an issue 😋
 
