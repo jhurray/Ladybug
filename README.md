@@ -66,19 +66,19 @@ let forest = try Array<Tree>(json: [treeJSON, treeJSON, treeJSON])
 
 #### Cocoapods
 
+Add the following to your `Podfile`
+
 ```ruby
 pod 'Ladybug', '~> 1.0.0'
-```
-Then add the following:
-
-```swift
-import Ladybug
 ```
 
 #### Carthage
 
-Unfortunately Carthage will not build using the XCode9 beta due to [this issue](https://github.com/Carthage/Carthage/issues/2104). Once the bug is fixed, I will add Carthage support.
+Add the following to your `Cartfile`
 
+```ruby
+github "jhurray/Ladybug" ~> 1.0.0
+```
 
 ## Mapping JSON Keys to Properties <a name="json-to-property"></a>
 Ok, it gets a little more complicated, but its easy, I swear. 
