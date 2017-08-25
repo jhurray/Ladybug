@@ -286,6 +286,8 @@ static var transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
 ]
 ```
 
+There was no disussion of this in [SE-0161](https://github.com/apple/swift-evolution/blob/master/proposals/0161-key-paths.md).
+
 ### Whats wrong with `Codable`? <a name="why-not-codable"></a>
 
 As mentioned before, `Codable` is a great step towards simplifying JSON parsing in swift, but the O(n) boilerplate that has become a mainstay in swift JSON parsing still exists when using `Codable` (e.g. For every property your object has, you need to write 1 or more lines of code to map the json to said property). In Apple's documentation on [Encoding and Decoding Custom Types](https://developer.apple.com/documentation/foundation/archives_and_serialization/encoding_and_decoding_custom_types), you can see that as soon as JSON keys diverge from property keys, you have to write a ton of boilerplate code to get `Codable` conformance. Ladybug sidesteps this, and  does a lot of this for you under the hood.
