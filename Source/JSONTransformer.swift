@@ -154,7 +154,7 @@ public struct DateTransformer: JSONTransformer {
      * iso8601
      * custom(format: String)
     */
-    public enum DateFormat: Hashable {
+    public enum Format: Hashable {
         /// Decode the `Date` as a UNIX timestamp from a JSON number.
         case secondsSince1970
         /// Decode the `Date` as UNIX millisecond timestamp from a JSON number.
@@ -164,7 +164,7 @@ public struct DateTransformer: JSONTransformer {
         /// Decode the `Date` with a custom date format string
         case custom(format: String)
         
-        public static func == (lhs: DateFormat, rhs: DateFormat) -> Bool {
+        public static func == (lhs: Format, rhs: Format) -> Bool {
             switch (lhs, rhs) {
             case (.secondsSince1970, .secondsSince1970),
                  (.millisecondsSince1970, .millisecondsSince1970),
@@ -192,7 +192,7 @@ public struct DateTransformer: JSONTransformer {
     }
     
     public let keyPath: JSONKeyPath?
-    private let dateFormat: DateFormat
+    private let format: Format
     private let customAdapter: ((Any?) -> Date?)?
     
     /**
@@ -200,9 +200,9 @@ public struct DateTransformer: JSONTransformer {
      
      - Parameter dateFormat: The expected format of the raw JSON value
      */
-    public init(dateFormat: DateFormat) {
+    public init(format: Format) {
         self.keyPath = nil
-        self.dateFormat = dateFormat
+        self.format = format
         self.customAdapter = nil
     }
     
@@ -212,9 +212,9 @@ public struct DateTransformer: JSONTransformer {
      - Parameter keyPath: Key path that points to the JSON value that is being mapped
      - Parameter dateFormat: The expected format of the raw JSON value
      */
-    public init(keyPath: JSONKeyPath, dateFormat: DateFormat) {
+    public init(keyPath: JSONKeyPath, format: Format) {
         self.keyPath = keyPath
-        self.dateFormat = dateFormat
+        self.format = format
         self.customAdapter = nil
     }
     
@@ -225,7 +225,7 @@ public struct DateTransformer: JSONTransformer {
      */
     public init(customAdapter: @escaping (Any?) -> Date?) {
         self.keyPath = nil
-        self.dateFormat = .secondsSince1970
+        self.format = .secondsSince1970
         self.customAdapter = customAdapter
     }
     
@@ -237,7 +237,7 @@ public struct DateTransformer: JSONTransformer {
      */
     public init(keyPath: JSONKeyPath, customAdapter: @escaping (Any?) -> Date?) {
         self.keyPath = keyPath
-        self.dateFormat = .secondsSince1970
+        self.format = .secondsSince1970
         self.customAdapter = customAdapter
     }
     
@@ -249,7 +249,7 @@ public struct DateTransformer: JSONTransformer {
                 // JSONDecoder will throw an error and initialization will fail
                 return
             }
-            let dateFormatter = DateFormat.millisecondsSince1970.dateFormatter
+            let dateFormatter = Format.millisecondsSince1970.dateFormatter
             json[propertyKey] = Int(dateFormatter.string(from: date))
             return
         }
@@ -268,11 +268,11 @@ public struct DateTransformer: JSONTransformer {
         guard let dateString = possibleDateString else {
             return
         }
-        guard dateFormat != .millisecondsSince1970 else {
+        guard format != .millisecondsSince1970 else {
             json[propertyKey] = Int(dateString)
             return
         }
-        if let millisecondsSince1970String = DateFormatAdapter.shared.convert(dateString, fromFormat: dateFormat, toFormat: .millisecondsSince1970) {
+        if let millisecondsSince1970String = DateFormatAdapter.shared.convert(dateString, fromFormat: format, toFormat: .millisecondsSince1970) {
             json[propertyKey] = Int(millisecondsSince1970String)
         }
     }

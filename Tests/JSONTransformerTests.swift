@@ -65,8 +65,8 @@ class JSONTransformerTests: XCTestCase {
     }
     
     func testDateTransformer() {
-        let format = DateTransformer.DateFormat.custom(format: formatString)
-        let transformer = DateTransformer(keyPath: JSONKeyPath("date_key"), dateFormat: format)
+        let format = DateTransformer.Format.custom(format: formatString)
+        let transformer = DateTransformer(keyPath: JSONKeyPath("date_key"), format: format)
         let formatter = DateFormatter()
         formatter.dateFormat = formatString
         let date = formatter.date(from: jsonDictionary["date_key"] as! String)
@@ -90,10 +90,10 @@ class JSONTransformerTests: XCTestCase {
     }
     
     func testDateFormats() {
-        XCTAssertEqual(DateTransformer.DateFormat.secondsSince1970, DateTransformer.DateFormat.secondsSince1970)
-        XCTAssertEqual(DateTransformer.DateFormat.millisecondsSince1970, DateTransformer.DateFormat.millisecondsSince1970)
-        XCTAssertEqual(DateTransformer.DateFormat.iso8601, DateTransformer.DateFormat.iso8601)
-        XCTAssertEqual(DateTransformer.DateFormat.custom(format: "ok kewl"), DateTransformer.DateFormat.custom(format: "ok kewl"))
+        XCTAssertEqual(DateTransformer.Format.secondsSince1970, DateTransformer.Format.secondsSince1970)
+        XCTAssertEqual(DateTransformer.Format.millisecondsSince1970, DateTransformer.Format.millisecondsSince1970)
+        XCTAssertEqual(DateTransformer.Format.iso8601, DateTransformer.Format.iso8601)
+        XCTAssertEqual(DateTransformer.Format.custom(format: "ok kewl"), DateTransformer.Format.custom(format: "ok kewl"))
     }
     
     func testDefaultValueTransformer() {

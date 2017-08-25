@@ -190,7 +190,7 @@ Finally, lets add dates to the mix. You can use `DateTransformer` to map formatt
 Ladybug supports multiple date parsing formats:
 
 ```swift
-public enum DateFormat: Hashable {
+public enum DateTransformer.Format: Hashable {
    /// Decode the `Date` as a UNIX timestamp from a JSON number.
    case secondsSince1970
    /// Decode the `Date` as UNIX millisecond timestamp from a JSON number.
@@ -218,8 +218,8 @@ struct SomeDates: JSONCodable {
     let createdAt: Date
     
     static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
-        "july4th": DateTransformer(dateFormat: .custom(format: "MM/dd/yyyy")),
-        "Y2K": DateTransformer(dateFormat: .secondsSince1970),
+        "july4th": DateTransformer(format: .custom(format: "MM/dd/yyyy")),
+        "Y2K": DateTransformer(format: .secondsSince1970),
         "createdAt": DateTransformer(customAdapter: { (_) -> Date? in
             return Date()
         })
