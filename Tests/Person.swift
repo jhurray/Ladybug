@@ -32,11 +32,11 @@ struct Pet: JSONCodable {
     }
     """
     
-    static let transformers: [JSONTransformer] = [
-        KeyPathTransformer(propertyName: "kind", keyPath: JSONKeyPath("pet_kind")),
-        DateTransformer(propertyName: "createdAt", customAdapter: { (_) -> Date in
+    static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
+        "kind": JSONKeyPath("pet_kind"),
+        "createdAt": DateTransformer { _ in
             return Date()
-        })
+        }
     ]
 
     enum Kind: String, Codable {
@@ -76,13 +76,13 @@ struct Person: JSONCodable {
     }
     """
     
-    static let transformers: [JSONTransformer] = [
-        NestedObjectTransformer<Pet>(propertyName: "pet", keyPath: JSONKeyPath("pet_thing")),
-        KeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("full_name")),
-        KeyPathTransformer(propertyName: "petName", keyPath: JSONKeyPath("pet_thing", "name")),
-        DateTransformer(propertyName: "birthday", keyPath: JSONKeyPath("date_of_birth"), dateFormat: .custom(format: "MM/dd/yyyy")),
-        NestedListTransformer<Person>(propertyName: "kids"),
-        NestedObjectTransformer<Pet>(propertyName: "favoritePet", keyPath: JSONKeyPath("pets", 1)),
+    static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
+        "pet": NestedObjectTransformer<Pet>(keyPath: JSONKeyPath("pet_thing")),
+        "name": JSONKeyPath("full_name"),
+        "petName": JSONKeyPath("pet_thing", "name"),
+        "birthday": DateTransformer(keyPath: "date_of_birth", dateFormat: .custom(format: "MM/dd/yyyy")),
+        "kids": NestedListTransformer<Person>(),
+        "favoritePet": NestedObjectTransformer<Pet>(keyPath: JSONKeyPath("pets", 1)),
     ]
     
     enum Gender: String, Codable {

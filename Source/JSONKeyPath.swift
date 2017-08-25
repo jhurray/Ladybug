@@ -14,7 +14,7 @@ public protocol JSONSubscript {}
 extension Int: JSONSubscript {}
 extension String: JSONSubscript {}
 
-/// Used to subscript JSON objects
+/// Used to subscript JSON objects. Conforms to `JSONTransformer`.
 public struct JSONKeyPath {
     
     fileprivate var segments: [JSONSubscript]
