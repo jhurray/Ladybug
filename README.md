@@ -298,7 +298,7 @@ Its easy to go a little to far with `MapTransformer`. In the example below, the 
 "values": [1, 1, 2, 3, 5, 8, 13]
 }
 ... 
-struct Count: JSONCodable {
+struct FibonacciSequence: JSONCodable {
 	let values: [Int]
 	let sum: Int
 	
