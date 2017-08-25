@@ -8,6 +8,9 @@
 
 import Foundation
 
+/// A typealias of string. In future versions may be `AnyKeyPath`.
+public typealias PropertyKey = String
+
 /// A protocol that provides Codable conformance and supports initialization from JSON and JSON Data
 public protocol JSONCodable: Codable {
     
@@ -26,7 +29,7 @@ public protocol JSONCodable: Codable {
     init(json: Any) throws
     
     /// Supplies an array of transformers used to map JSON values to properties of the conforming object
-    static var transformers: [JSONTransformer] { get }
+    static var transformersByPropertyKey: [PropertyKey: JSONTransformer] { get }
 }
 
 /// Exception type thrown by objects conforming to JSONCodable
@@ -88,12 +91,12 @@ public extension JSONCodable {
     }
     
     internal static func alter(_ json: inout [String: Any]) {
-        for transformer in Self.transformers {
-            transformer.transform(&json)
+        for (propertyKey, transformer) in Self.transformersByPropertyKey {
+            transformer.transform(&json, mappingTo: propertyKey)
         }
     }
     
-    public static var transformers: [JSONTransformer] {
-        return []
+    public static var transformersByPropertyKey: [PropertyKey: JSONTransformer] {
+        return [:]
     }
 }

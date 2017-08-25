@@ -11,7 +11,7 @@ import XCTest
 
 protocol DateFormatAdapterTest {
     
-    var fromFormat: DateTransformer.DateFormat { get }
+    var fromFormat: DateTransformer.Format { get }
     var dateString: String! { get }
     var adapter: DateFormatAdapter { get }
     
@@ -61,7 +61,7 @@ extension DateFormatAdapterTest {
 class DateFormatAdapterSecondsSince1970Tests: XCTestCase, DateFormatAdapterTest {
     
     let adapter = DateFormatAdapter.shared
-    let fromFormat: DateTransformer.DateFormat = .secondsSince1970
+    let fromFormat: DateTransformer.Format = .secondsSince1970
     var dateString: String!
     
     override func setUp() {
@@ -80,7 +80,7 @@ class DateFormatAdapterSecondsSince1970Tests: XCTestCase, DateFormatAdapterTest 
 class DateFormatAdapterMillisecondsSince1970Tests: XCTestCase, DateFormatAdapterTest {
     
     let adapter = DateFormatAdapter.shared
-    let fromFormat: DateTransformer.DateFormat = .millisecondsSince1970
+    let fromFormat: DateTransformer.Format = .millisecondsSince1970
     var dateString: String!
     
     override func setUp() {
@@ -99,7 +99,7 @@ class DateFormatAdapterMillisecondsSince1970Tests: XCTestCase, DateFormatAdapter
 class DateFormatAdapterCustomFormatTests: XCTestCase, DateFormatAdapterTest {
     
     let adapter = DateFormatAdapter.shared
-    let fromFormat: DateTransformer.DateFormat = .custom(format: "EEEE, MMM d, yyyy")
+    let fromFormat: DateTransformer.Format = .custom(format: "EEEE, MMM d, yyyy")
     var dateString: String!
     
     override func setUp() {
@@ -118,7 +118,7 @@ class DateFormatAdapterCustomFormatTests: XCTestCase, DateFormatAdapterTest {
 class DateFormatAdapterISO8601Tests: XCTestCase, DateFormatAdapterTest {
     
     let adapter = DateFormatAdapter.shared
-    let fromFormat: DateTransformer.DateFormat = .iso8601
+    let fromFormat: DateTransformer.Format = .iso8601
     var dateString: String!
     
     override func setUp() {

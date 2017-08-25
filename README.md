@@ -1,11 +1,11 @@
 # Ladybug 🐞
 
-Ladybug makes it easy to write a simple model or data-model layer in Swift 4
+Ladybug makes it easy to write a model or data-model layer in Swift 4.
 
-This framework is *modeled* (ha 👏 ha 👏) after [Mantle](https://github.com/Mantle/Mantle). Mantle provides easy translation from JSON to model objects, and also comes with [`NSCoding`](https://developer.apple.com/documentation/foundation/nscoding) conformance out of the box. Ladybug takes advantage of the new [`Codable`](https://developer.apple.com/documentation/swift/codable) protocol to provide similar functionality without subclassing `NSObject`.
+This framework is *modeled* (ha 👏 ha 👏) after [Mantle](https://github.com/Mantle/Mantle). Mantle provides easy translation from JSON to model objects with minimal setup, and also comes with [`NSCoding`](https://developer.apple.com/documentation/foundation/nscoding) conformance out of the box. Ladybug takes advantage of the new [`Codable`](https://developer.apple.com/documentation/swift/codable) protocol to provide similar functionality without subclassing `NSObject`.
 
 ![language](https://img.shields.io/badge/Language-Swift4-56A4D3.svg)
-![Version](https://img.shields.io/badge/Pod-%200.0.2%20-96281B.svg)
+![Version](https://img.shields.io/badge/Pod-%201.0.0%20-96281B.svg)
 ![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg)
 ![Platform](https://img.shields.io/badge/platform-%20iOS|tvOS|macOS|watchOS%20-lightgrey.svg)
 
@@ -21,12 +21,12 @@ This framework is *modeled* (ha 👏 ha 👏) after [Mantle](https://github.com/
 * [Musings 🤔](#musings)
 
 ## Why use 🐞? 
-Ladybug takes the pain out of parsing JSON in Swift. It allows you to map JSON keys to properties of your model without having to worry about explicit types. 
+Ladybug is the first 3rd party model framework for Swift where you dont need a line of code for every property of your model. **If a JSON key is the same as the property name you dont need to explicitly supply a mapping.**
 
-`Codable` is a huge step for modeling data in swift, but if your JSON structure diverges from your model, conforming to `Codable` can be a **huge** pain 🤕. I elaborate on this [here](#why-not-codable).
+This is true for `Codable`, but if your JSON structure diverges from your data model even slightly, you have to write *at least* 1 line of code for every property. I elaborate on this [here](#why-not-codable).
 
 ### Setup <a name="setup"></a>
-By conforming to the `JSONCodable` protocol provided by 🐞, you can initialize any `struct` or `class` with `Data` or JSON, and get full `Codable` conformance. If your JSON structure diverges form your data model, you can override the static `transformers` property to provide custom mapping.
+By conforming to the `JSONCodable` protocol provided by 🐞, you can initialize any `struct` or `class` with `Data` or JSON, and get full `Codable` conformance. If your JSON structure diverges form your data model, you can override the static `transformersByPropertyKey` property to provide custom mapping.
 
 
 ```swift
@@ -40,8 +40,8 @@ struct Tree: JSONCodable {
     let family: Family
     let age: Int
     
-    static let transformers: [JSONTransformer] = [
-    	KeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("tree_name"))	
+    static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
+    	"name": JSONKeyPath("tree_name")
     ]
 }
 ...
@@ -60,23 +60,25 @@ let forest = try Array<Tree>(json: [treeJSON, treeJSON, treeJSON])
 
 **Note:** Any nested enum must conform to `Codable` and `RawRepresentable` where the `RawValue` is `Codable`.
 
+**Note:** `PropertyKey` is a `String` typealias.
+
 ### Cocoapods & Carthage <a name="ingestion"></a>
 
 #### Cocoapods
 
-```ruby
-pod 'Ladybug', '~> 0.0.2'
-```
-Then add the following:
+Add the following to your `Podfile`
 
-```swift
-import Ladybug
+```ruby
+pod 'Ladybug', '~> 1.0.0'
 ```
 
 #### Carthage
 
-Unfortunately Carthage will not build using the XCode9 beta due to [this issue](https://github.com/Carthage/Carthage/issues/2104). Once the bug is fixed, I will add Carthage support.
+Add the following to your `Cartfile`
 
+```ruby
+github "jhurray/Ladybug" ~> 1.0.0
+```
 
 ## Mapping JSON Keys to Properties <a name="json-to-property"></a>
 Ok, it gets a little more complicated, but its easy, I swear. 
@@ -87,46 +89,24 @@ You can associate JSON keys with properties via different objects conforming to 
 
 There are 6 types of transformers provided:    
 
-* `KeyPathTransformer` (mapping key paths to property names)
+* `JSONKeyPath` (mapping key paths to property names)
 * `NestedObjectTransformer<T: JSONCodable>` (explicitly declaring nested types)
-* `NestedListTransformer<T: JSONCodable>` (explicitly declaring nested list)
+* `NestedListTransformer<T: JSONCodable>` (explicitly declaring nested lists)
 * `DateTransformer` (handling dates in different formats)
 * `MapTransformer<T: Codable>` (handling JSON values that require further mapping)
 * `DefaultValueTransformer` (assigning default values to properties)
 
-Transformers are provided via a readonly `static` property of the `JSONCodable` protocol.
+Transformers are provided via a readonly `static` property of the `JSONCodable` protocol, and are indexed by `PropertyKey`.
 
 ```swift
-static var transformers: [JSONTransformer] { get }
+static var transformersByPropertyKey: [PropertyKey: JSONTransformer] { get }
 ```
 
-### `KeyPathTransformer`
+### `JSONKeyPath` <a name="jsonkeypath"></a>
 
+In the example at the beginning we used `JSONKeyPath` to map the value associated with the `tree_name` field to the `name` property of `Tree`.
 
-To solve the problem in the first example, we overrode `transformers` in our `Tree` object, and supplied a key path transformer.
-
-```swift
-struct Tree: JSONCodable {
-    
-    enum Family: Int, Codable {
-        case deciduous, coniferous
-    }
-    
-    let name: String
-    let family: Family
-    let age: Int
-    
-    static let transformers: [JSONTransformer] = [
-    	KeyPathTransformer(propertyName: "name", keyPath: JSONKeyPath("tree_name"))
-    ]
-}
-```
-
-This maps the value associated with the `tree_name` field to the `name` property.
-
-### What's a `JSONKeyPath`? <a name="jsonkeypath"></a>
-
-I'm glad you asked. `JSONKeyPath` is used to access values in JSON. It is initialized with a variadic list of json subscripts (`Int` or `String`).
+`JSONKeyPath` is used to access values in JSON. It is initialized with a variadic list of json subscripts (`Int` or `String`).
 
 In the example below:
 
@@ -146,13 +126,16 @@ In the example below:
 }
 ```
 
-**Note:** These key paths are used optionally in the rest of the transformers if the transformed property name does not match the json structure.
+**Note:** These key paths are used optionally in objects conforming to `JSONTransformer` when the property being mapped to does not match the json structure.
 
 **Note:** JSONKeyPath can also be expressed as a string literal.
-> `JSONKeyPath("some_key", "some_other_key")` == `"some_key.some_other_key"`
+> `JSONKeyPath("some_key")` == `"some_key"`
 
 **Note:** You can also use keypath notation from Objective-C.
-> `JSONKeyPath("foo", "hello")` == `JSONKeyPath("foo.hello")`
+> `JSONKeyPath("foo", "hello")` == `JSONKeyPath("foo.hello")` == "foo.hello"    
+
+This does not work for `Int` subscripts
+> `JSONKeyPath("bar", 1)` != `JSONKeyPath("bar.1")`
 
 
 ### Nested Objects: `NestedObjectTransformer` and `NestedListTransformer`
@@ -184,10 +167,10 @@ struct Tree: JSONCodable {
     let firstLeaf: Leaf?
     let leaves: [Leaf]
     ...
-    static let transformers: [JSONTransformer] = [
+    static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
     	...
-    	NestedListTransformer<Leaf>(propertyName: "leaves"),
-    	NestedObjectTransformer<Leaf>(propertyName: "firstLeaf", keyPath: JSONKeyPath("leaves", 0))
+    	"leaves": NestedListTransformer<Leaf>(),
+    	"firstLeaf": NestedObjectTransformer<Leaf>(keyPath: JSONKeyPath("leaves", 0))
     ]
     
     struct Leaf: JSONCodable {
@@ -207,7 +190,7 @@ Finally, lets add dates to the mix. You can use `DateTransformer` to map formatt
 Ladybug supports multiple date parsing formats:
 
 ```swift
-public enum DateFormat: Hashable {
+public enum DateTransformer.Format: Hashable {
    /// Decode the `Date` as a UNIX timestamp from a JSON number.
    case secondsSince1970
    /// Decode the `Date` as UNIX millisecond timestamp from a JSON number.
@@ -234,10 +217,10 @@ struct SomeDates: JSONCodable {
     let Y2K: Date
     let createdAt: Date
     
-    static let transformers: [JSONTransformer] = [
-        DateTransformer(propertyName: "july4th", dateFormat: .custom(format: "MM/dd/yyyy")),
-        DateTransformer(propertyName: "Y2K", dateFormat: .secondsSince1970),
-        DateTransformer(propertyName: "createdAt", customAdapter: { (_) -> Date? in
+    static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
+        "july4th": DateTransformer(format: .custom(format: "MM/dd/yyyy")),
+        "Y2K": DateTransformer(format: .secondsSince1970),
+        "createdAt": DateTransformer(customAdapter: { (_) -> Date? in
             return Date()
         })
     ]
@@ -258,8 +241,8 @@ If you need to provide a simple mapping from a JSON value to a property, use `Ma
 struct Object: JSONCodable {
     let count: Int
     
-    static let transformers: [JSONTransformer] = [
-    	MapTransformer<Int>(propertyName: "count") {
+    static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
+    	"count": MapTransformer<Int> {
     		return Int($0 as! String)
     	}
     ]
@@ -268,10 +251,10 @@ struct Object: JSONCodable {
 
 ### Default Values / Migrations: `DefaultValueTransformer` <a name="default-values"></a>
 
-If you wish to supply a default value for an property, you can use `DefaultValueTransformer`. Supply the property name and the the default value. You can also control whether or not to override the property if the `propertyName` key exists in the JSON payload.
+If you wish to supply a default value for a property, you can use `DefaultValueTransformer`. You supply the default value, and can also control whether or not to override the property if the property key exists in the JSON payload.
 
 ```swift
-init(propertyName: String, value: Any, override: Bool = false)
+init(value: Any, override: Bool = false)
 ```
 
 The default transformer is useful when API's change, and can help migration from cached JSON data to `JSONCodable` objects with new properties.
@@ -295,7 +278,7 @@ You can see examples in [`ClassConformanceTests.swift`](https://github.com/jhurr
 
 ### Whats wrong with `Codable`? <a name="why-not-codable"></a>
 
-As mentioned before, `Codable` is a great step towards simplifying JSON parsing in swift, but the O(n) boilerplate that has become a mainstay in swift JSON parsing still exists when using `Codable` (e.g. For every property your object has, you need to write 1 or more lines of code to map the json to said property). In Apple's documentation on [Encoding and Decoding Custom Types](https://developer.apple.com/documentation/foundation/archives_and_serialization/encoding_and_decoding_custom_types), you can see that as soon as JSON keys diverge from property keys, you have to write a ton of boilerplate code to get `Codable` conformance. Ladybug sidesteps this, and  does a lot fo this for you under the hood.
+As mentioned before, `Codable` is a great step towards simplifying JSON parsing in swift, but the O(n) boilerplate that has become a mainstay in swift JSON parsing still exists when using `Codable` (e.g. For every property your object has, you need to write 1 or more lines of code to map the json to said property). In Apple's documentation on [Encoding and Decoding Custom Types](https://developer.apple.com/documentation/foundation/archives_and_serialization/encoding_and_decoding_custom_types), you can see that as soon as JSON keys diverge from property keys, you have to write a ton of boilerplate code to get `Codable` conformance. Ladybug sidesteps this, and  does a lot of this for you under the hood.
 
 ### Performance
 Ladybugs decoding and mapping performance is about the same as the performance of `JSONDecoder`. The transformers are very lightweight, but obviously as the number of transformers per model increases, the perfomace degrades at a linear rate. Just keep in mind that the closer your JSON schema is to your model schema, the more performant it will be.
@@ -306,7 +289,7 @@ performance = (JSONDecoder performance) + (Ladybug transformer performance)
 
 ### It would be pretty great if `AnyKeyPath` conformed to `ExpressibleByStringLiteral`
 
-If Swift 4 key paths could be expressible by a string value, we could use that instead of `propertyName: String` in `JSONTransformer`. This would provide a safer interface.
+If Swift 4 key paths could be expressible by a string value, we could use that as our `PropertyKey` typealias instead of `String`. This would be a safer alternative.
 
 ### Be careful with `MapTransformer`
 
@@ -314,15 +297,15 @@ Its easy to go a little to far with `MapTransformer`. In the example below, the 
 
 ```swift
 {
-"values": [1, 8, 9, 14, 6]
+"values": [1, 1, 2, 3, 5, 8, 13]
 }
 ... 
 struct Count: JSONCodable {
 	let values: [Int]
 	let sum: Int
 	
-	static let transformers = [
-		MapTransformer<Int>(propertyName: "sum", keyPath: JSONKeyPath("values")) { value in
+	static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
+		MapTransformer<Int>(keyPath: "values") { value in
 			let values = value as! [Int]
 			return values.reduce(0) { $0 + $1 }
 		}
@@ -333,10 +316,13 @@ struct Count: JSONCodable {
 ### Things I would like to do:   
 - [ ] Custom rules: Provide a simple interface to say by default, map **under_scored** JSON keys to **camelCased** properties.
 
+### Why is this called Ladybug?
+
+Ask [Billy](https://twitter.com/billy_the_kid), or file an issue 😋
 
 ## Contact Info && Contributing
 
-Feel free to email me at [jhurray33@gmail.com](mailto:jhurray33@gmail.com). I'd love to hear your thoughts on this, or see examples where this has been used.
+Feel free to email me at [jhurray33@gmail.com](mailto:jhurray33@gmail.com) or [hit me up on the twitterverse](https://twitter.com/JeffHurray). I'd love to hear your thoughts on this, or see examples where this has been used.
 
 [MIT License](https://github.com/jhurray/Ladybug/blob/master/LICENSE)
 
