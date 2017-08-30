@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		261139911F565E40001C7AB9 /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261139901F565E40001C7AB9 /* Operators.swift */; };
+		261139931F568996001C7AB9 /* DateFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261139921F568996001C7AB9 /* DateFormat.swift */; };
 		264615A21F49044C00789AB1 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 264615A11F49044C00789AB1 /* README.md */; };
 		264615A31F4906BC00789AB1 /* JSONTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C272521F3005EB002537C5 /* JSONTransformer.swift */; };
 		264615A41F4906BC00789AB1 /* JSONTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C272521F3005EB002537C5 /* JSONTransformer.swift */; };
@@ -49,6 +51,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		261139901F565E40001C7AB9 /* Operators.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
+		261139921F568996001C7AB9 /* DateFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormat.swift; sourceTree = "<group>"; };
 		264615A11F49044C00789AB1 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		26AF152A1F2D6E7300D963FF /* Ladybug.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ladybug.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		26AF152D1F2D6E7300D963FF /* Ladybug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Ladybug.h; sourceTree = "<group>"; };
@@ -165,6 +169,8 @@
 				26AF15921F2D721900D963FF /* JSONKeyPath.swift */,
 				26C272521F3005EB002537C5 /* JSONTransformer.swift */,
 				26AF15A11F2EE2E300D963FF /* DateFormatAdapter.swift */,
+				261139921F568996001C7AB9 /* DateFormat.swift */,
+				261139901F565E40001C7AB9 /* Operators.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -391,6 +397,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				26AF158E1F2D71D200D963FF /* JSONCodable.swift in Sources */,
+				261139911F565E40001C7AB9 /* Operators.swift in Sources */,
+				261139931F568996001C7AB9 /* DateFormat.swift in Sources */,
 				26AF15A21F2EE2E300D963FF /* DateFormatAdapter.swift in Sources */,
 				26C272531F3005EB002537C5 /* JSONTransformer.swift in Sources */,
 				26AF15931F2D721900D963FF /* JSONKeyPath.swift in Sources */,

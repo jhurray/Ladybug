@@ -1,29 +1,27 @@
 # Ladybug 🐞
 
-Ladybug makes it easy to write a model or data-model layer in Swift 4.
-
-This framework is *modeled* (ha 👏 ha 👏) after [Mantle](https://github.com/Mantle/Mantle). Mantle provides easy translation from JSON to model objects with minimal setup, and also comes with [`NSCoding`](https://developer.apple.com/documentation/foundation/nscoding) conformance out of the box. Ladybug takes advantage of the new [`Codable`](https://developer.apple.com/documentation/swift/codable) protocol to provide similar functionality without subclassing `NSObject`.
+Ladybug makes it easy to write a model or data-model layer in Swift 4. Full `Codable` conformance without the headache.
 
 ![language](https://img.shields.io/badge/Language-Swift4-56A4D3.svg)
-![Version](https://img.shields.io/badge/Pod-%201.0.0%20-96281B.svg)
+![Version](https://img.shields.io/badge/Pod-%202.0.0%20-96281B.svg)
 ![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg)
 ![Platform](https://img.shields.io/badge/platform-%20iOS|tvOS|macOS|watchOS%20-lightgrey.svg)
 
 ### Quick Links
-* [Setup](#setup)
+* [Why use 🐞?](#why-bug)
 * [Cocoapods & Carthage](#ingestion)
 * [Mapping JSON to properties](#json-to-property)
-  * [Nested Objects](#nested-objecs)
+  * [Nested Objects](#nested-objects)
   * [Dates](#dates)
   * [Additional Mapping](#mapping)
   * [Default Values / Migration](#default-values)
   * [JSONKeyPath](#jsonkeypath)
 * [Musings 🤔](#musings)
 
-## Why use 🐞? 
-Ladybug is the first 3rd party model framework for Swift where you dont need a line of code for every property of your model. **If a JSON key is the same as the property name you dont need to explicitly supply a mapping.**
+## Why use 🐞? <a name="why-bug"></a>
+[Codable](https://developer.apple.com/documentation/swift/codable) is a great step for Swift, but it can get [complicated](#why-not-codable) really fast. Ladybug will save you time and energy when creating models in Swift, and provides `Codable` conformance without the headache.
 
-This is true for `Codable`, but if your JSON structure diverges from your data model even slightly, you have to write *at least* 1 line of code for every property. I elaborate on this [here](#why-not-codable).
+
 
 ### Setup <a name="setup"></a>
 By conforming to the `JSONCodable` protocol provided by 🐞, you can initialize any `struct` or `class` with `Data` or JSON, and get full `Codable` conformance. If your JSON structure diverges form your data model, you can override the static `transformersByPropertyKey` property to provide custom mapping.
@@ -69,7 +67,7 @@ let forest = try Array<Tree>(json: [treeJSON, treeJSON, treeJSON])
 Add the following to your `Podfile`
 
 ```ruby
-pod 'Ladybug', '~> 1.0.0'
+pod 'Ladybug', '~> 2.0.0'
 ```
 
 #### Carthage
@@ -77,7 +75,7 @@ pod 'Ladybug', '~> 1.0.0'
 Add the following to your `Cartfile`
 
 ```ruby
-github "jhurray/Ladybug" ~> 1.0.0
+github "jhurray/Ladybug" ~> 2.0.0
 ```
 
 ## Mapping JSON Keys to Properties <a name="json-to-property"></a>
@@ -90,11 +88,9 @@ You can associate JSON keys with properties via different objects conforming to 
 There are 6 types of transformers provided:    
 
 * `JSONKeyPath` (mapping key paths to property names)
-* `NestedObjectTransformer<T: JSONCodable>` (explicitly declaring nested types)
-* `NestedListTransformer<T: JSONCodable>` (explicitly declaring nested lists)
-* `DateTransformer` (handling dates in different formats)
-* `MapTransformer<T: Codable>` (handling JSON values that require further mapping)
-* `DefaultValueTransformer` (assigning default values to properties)
+* `DateFormat` (handling dates in different formats)
+* `Map<T: Codable>` (handling JSON values that require further mapping)
+* `Default` (assigning default values to properties)
 
 Transformers are provided via a readonly `static` property of the `JSONCodable` protocol, and are indexed by `PropertyKey`.
 
@@ -132,13 +128,13 @@ In the example below:
 > `JSONKeyPath("some_key")` == `"some_key"`
 
 **Note:** You can also use keypath notation from Objective-C.
-> `JSONKeyPath("foo", "hello")` == `JSONKeyPath("foo.hello")` == "foo.hello"    
+> `JSONKeyPath("foo", "hello")` == `JSONKeyPath("foo.hello")` ==  `"foo.hello"`
 
 This does not work for `Int` subscripts
 > `JSONKeyPath("bar", 1)` != `JSONKeyPath("bar.1")`
 
 
-### Nested Objects: `NestedObjectTransformer` and `NestedListTransformer`
+### Nested Objects <a name="nested-objects"></a>
 
 Lets add a nested class, `Leaf`. Trees have leaves. Nice.
 
@@ -169,8 +165,8 @@ struct Tree: JSONCodable {
     ...
     static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
     	...
-    	"leaves": NestedListTransformer<Leaf>(),
-    	"firstLeaf": NestedObjectTransformer<Leaf>(keyPath: JSONKeyPath("leaves", 0))
+    	"leaves": [Leaf].transformer,
+    	"firstLeaf": Leaf.transformer
     ]
     
     struct Leaf: JSONCodable {

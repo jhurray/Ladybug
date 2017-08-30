@@ -69,6 +69,11 @@ public extension Array where Element: JSONCodable {
         }
         self = list
     }
+    
+    /// A transformer that explicitly declares a nested list type
+    public static var transformer: JSONTransformer {
+        return NestedListTransformer<Element>()
+    }
 }
 
 public extension JSONCodable {
@@ -88,6 +93,11 @@ public extension JSONCodable {
         decoder.dateDecodingStrategy = .millisecondsSince1970
         let instance = try decoder.decode(Self.self, from: jsonData)
         self = instance
+    }
+    
+    /// A transformer that explicitly declares a nested type
+    public static var transformer: JSONTransformer {
+        return NestedObjectTransformer<Self>()
     }
     
     internal static func alter(_ json: inout [String: Any]) {

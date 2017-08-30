@@ -34,9 +34,7 @@ struct Pet: JSONCodable {
     
     static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
         "kind": JSONKeyPath("pet_kind"),
-        "createdAt": DateTransformer { _ in
-            return Date()
-        }
+        "createdAt": currentDate
     ]
 
     enum Kind: String, Codable {
@@ -77,12 +75,12 @@ struct Person: JSONCodable {
     """
     
     static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
-        "pet": NestedObjectTransformer<Pet>(keyPath: JSONKeyPath("pet_thing")),
-        "name": JSONKeyPath("full_name"),
+        "pet": "pet_thing" <- Pet.transformer,
+        "name": "full_name",
         "petName": JSONKeyPath("pet_thing", "name"),
-        "birthday": DateTransformer(keyPath: "date_of_birth", format: .custom(format: "MM/dd/yyyy")),
-        "kids": NestedListTransformer<Person>(),
-        "favoritePet": NestedObjectTransformer<Pet>(keyPath: JSONKeyPath("pets", 1)),
+        "birthday": JSONKeyPath("date_of_birth") <- format("MM/dd/yyyy"),
+        "kids": [Person].transformer,
+        "favoritePet": JSONKeyPath("pets", 1) <- Pet.transformer,
     ]
     
     enum Gender: String, Codable {
