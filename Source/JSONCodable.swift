@@ -87,7 +87,7 @@ public extension JSONCodable {
         guard var jsonDictionary = json as? [String: Any] else {
             throw JSONCodableError.badType(expectedType: [String: Any].self, receivedType: type(of: json))
         }
-        Self.alter(&jsonDictionary)
+        Self.alterForDecoding(&jsonDictionary)
         let jsonData = try JSONSerialization.data(withJSONObject: jsonDictionary, options: [])
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .millisecondsSince1970
@@ -100,33 +100,15 @@ public extension JSONCodable {
         return NestedObjectTransformer<Self>()
     }
     
-    internal static func alter(_ json: inout [String: Any]) {
+    internal static func alterForDecoding(_ json: inout [String: Any]) {
         for (propertyKey, transformer) in Self.transformersByPropertyKey {
             transformer.transform(&json, mappingTo: propertyKey)
         }
-        let reflection = Mirror(reflecting: self)
-        reflection.children.forEach { (label, value) in
-            guard let propertyKey = label else { return }
-            let keyPath = JSONKeyPath(propertyKey)
-            if let jsonCodableValue = value as? JSONCodable {
-                guard var nestedJSON = json[jsonKeyPath: keyPath] as? [String: Any] else {
-                    return
-                }
-                type(of: jsonCodableValue).alter(&nestedJSON)
-                json[propertyKey] = nestedJSON
-            }
-            if let jsonCodableValue = value as? Array<JSONCodable>.Element {
-                guard let nestedJSONList = json[jsonKeyPath: keyPath] as? [[String: Any]] else {
-                    return
-                }
-                var alteredJSONList: [[String: Any]] = []
-                alteredJSONList.reserveCapacity(nestedJSONList.count)
-                for var json in nestedJSONList {
-                    type(of: jsonCodableValue).alter(&json)
-                    alteredJSONList.append(json)
-                }
-                json[propertyKey] = alteredJSONList 
-            }
+    }
+    
+    internal static func alterForEncoding(_ json: inout [String: Any]) {
+        for (propertyKey, transformer) in Self.transformersByPropertyKey {
+            transformer.reverseTransform(&json, mappingFrom: propertyKey)
         }
     }
     

@@ -17,6 +17,9 @@ public protocol JSONTransformer {
     
     // Alters a JSON object to prepare for decoding
     func transform(_ json: inout [String: Any], mappingTo propertyKey: PropertyKey)
+    
+    // Alters a JSON object to prepare for encoding
+    func reverseTransform(_ json: inout [String: Any], mappingFrom propertyKey: PropertyKey)
 }
 
 /// Maps a JSON value at this key path to a `Codable` property of an object conforming to `JSONCodable`
@@ -40,6 +43,10 @@ extension String: JSONTransformer {
     
     public func transform(_ json: inout [String : Any], mappingTo propertyKey: PropertyKey) {
         keyPath?.transform(&json, mappingTo: propertyKey)
+    }
+    
+    public func reverseTransform(_ json: inout [String: Any], mappingFrom propertyKey: PropertyKey) {
+        keyPath?.reverseTransform(&json, mappingFrom: propertyKey)
     }
 }
 
@@ -118,13 +125,21 @@ internal struct NestedObjectTransformer<Type: JSONCodable>: JSONTransformer {
         self.keyPath = keyPath
     }
     
-    public func transform(_ json: inout [String: Any], mappingTo propertyKey: PropertyKey) {
+    private func alterNestedJSON(_ json: inout [String: Any], propertyKey: PropertyKey, alteration: (inout [String: Any]) -> ()) {
         let keyPath = resolvedKeyPath(propertyKey)
         guard var nestedJSON = json[jsonKeyPath: keyPath] as? [String: Any] else {
             return
         }
-        Type.alter(&nestedJSON)
+        alteration(&nestedJSON)
         json[propertyKey] = nestedJSON
+    }
+    
+    public func transform(_ json: inout [String: Any], mappingTo propertyKey: PropertyKey) {
+        alterNestedJSON(&json, propertyKey: propertyKey, alteration: Type.alterForDecoding)
+    }
+    
+    public func reverseTransform(_ json: inout [String : Any], mappingFrom propertyKey: PropertyKey) {
+        alterNestedJSON(&json, propertyKey: propertyKey, alteration: Type.alterForEncoding)
     }
 }
 
@@ -142,17 +157,25 @@ internal struct NestedListTransformer<Type: JSONCodable>: JSONTransformer {
         self.keyPath = keyPath
     }
     
-    public func transform(_ json: inout [String: Any], mappingTo propertyKey: PropertyKey) {
+    private func alterNestedJSON(_ json: inout [String: Any], propertyKey: PropertyKey, alteration: (inout [String: Any]) -> ()) {
         let keyPath = resolvedKeyPath(propertyKey)
         guard let nestedJSONList = json[jsonKeyPath: keyPath] as? [[String: Any]] else {
             return
         }
         var alteredJSONList: [[String: Any]] = []
         for var nestedJSON in nestedJSONList {
-            Type.alter(&nestedJSON)
+            alteration(&nestedJSON)
             alteredJSONList.append(nestedJSON)
         }
         json[propertyKey] = alteredJSONList
+    }
+    
+    public func transform(_ json: inout [String: Any], mappingTo propertyKey: PropertyKey) {
+        alterNestedJSON(&json, propertyKey: propertyKey, alteration: Type.alterForDecoding)
+    }
+    
+    public func reverseTransform(_ json: inout [String : Any], mappingFrom propertyKey: PropertyKey) {
+        alterNestedJSON(&json, propertyKey: propertyKey, alteration: Type.alterForEncoding)
     }
 }
 
@@ -173,11 +196,24 @@ internal struct CompositeTransformer: JSONTransformer {
             $0.transform(&json, mappingTo: propertyKey)
         }
     }
+    
+    func reverseTransform(_ json: inout [String : Any], mappingFrom propertyKey: PropertyKey) {
+        transformers.forEach {
+            $0.reverseTransform(&json, mappingFrom: propertyKey)
+        }
+    }
 }
 
 internal extension JSONTransformer {
     
     internal func resolvedKeyPath(_ propertyKey: PropertyKey) -> JSONKeyPath {
         return keyPath ?? JSONKeyPath(propertyKey)
+    }
+}
+
+public extension JSONTransformer {
+    
+    func reverseTransform(_ json: inout [String: Any], mappingFrom propertyKey: PropertyKey) {
+        // Default Implementation - Override point
     }
 }

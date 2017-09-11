@@ -101,6 +101,11 @@ public enum DateFormat: Hashable, JSONTransformer {
             json[propertyKey] = Int(millisecondsSince1970String)
         }
     }
+    
+    public func reverseTransform(_ json: inout [String : Any], mappingFrom propertyKey: PropertyKey) {
+        
+        
+    }
 }
 
 /// Decode the `Date` as a UNIX timestamp from a JSON number.
