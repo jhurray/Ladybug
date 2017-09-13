@@ -85,7 +85,7 @@ class EncodableTests: XCTestCase {
             let encodedData = try encoder.encode(tree)
             let jsonObject = try JSONSerialization.jsonObject(with: treeJSON.data(using: .utf8)!)
             let treeFromJSON = try Tree(json: jsonObject)
-            let encodedJSONData = try encoder.encode(treeFromJSON)
+            let encodedJSONData = try treeFromJSON.toData()
             XCTAssertEqual(encodedData, encodedJSONData)
         }
         catch let error {
@@ -99,7 +99,7 @@ class EncodableTests: XCTestCase {
             let encodedData = try encoder.encode([tree, tree])
             let jsonObject = try JSONSerialization.jsonObject(with: treeJSON.data(using: .utf8)!)
             let treeFromJSON = try Tree(json: jsonObject)
-            let encodedJSONData = try encoder.encode([treeFromJSON, treeFromJSON])
+            let encodedJSONData = try [treeFromJSON, treeFromJSON].toData()
             XCTAssertEqual(encodedData, encodedJSONData)
         }
         catch let error {

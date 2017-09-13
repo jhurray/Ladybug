@@ -30,7 +30,9 @@ extension JSONKeyPath: JSONTransformer {
     }
     
     public func transform(_ json: inout [String: Any], mappingTo propertyKey: PropertyKey) {
-        json[propertyKey] = json[jsonKeyPath: self]
+        if let value = json[jsonKeyPath: self] {
+            json[propertyKey] = value
+        }
     }
 }
 

@@ -8,6 +8,29 @@
 
 import Foundation
 
+/// Decode the `Date` as a UNIX timestamp from a JSON number.
+public let secondsSince1970: JSONTransformer = DateFormat.secondsSince1970
+/// Decode the `Date` as UNIX millisecond timestamp from a JSON number.
+public let millisecondsSince1970: JSONTransformer = DateFormat.millisecondsSince1970
+/// Decode the `Date` as an ISO-8601-formatted string (in RFC 3339 format).
+public let iso8601: JSONTransformer = DateFormat.iso8601
+/// Decode the `Date` with a custom date format string
+public func format(_ format: String) -> JSONTransformer { return DateFormat.format(format) }
+/// Return a `Date` from the JSON value
+/// If the return value is nil and it is being mapped to
+/// a non-optional `Date` property an Exception will be thrown
+public func custom(_ adapter: @escaping (Any?) -> Date?) -> JSONTransformer {
+    return Map<Int> { value in
+        guard let date = adapter(value) else {
+            return nil
+        }
+        let formatter = DateFormat.millisecondsSince1970.dateFormatter
+        return Int(formatter.string(from: date))
+    }
+}
+// Assign the current date to the `Date` property
+public let currentDate: JSONTransformer = custom { _ in return Date() }
+
 /**
  Used to transform raw JSON values to Date objects.
  An enumerated type used to determine which format JSON dates are in. Can be used as a JSONTransformer.
@@ -16,7 +39,7 @@ import Foundation
  * iso8601
  * custom(format: String)
  */
-public enum DateFormat: Hashable, JSONTransformer {
+internal enum DateFormat: Hashable, JSONTransformer {
     /// Decode the `Date` as a UNIX timestamp from a JSON number.
     case secondsSince1970
     /// Decode the `Date` as UNIX millisecond timestamp from a JSON number.
@@ -25,12 +48,8 @@ public enum DateFormat: Hashable, JSONTransformer {
     case iso8601
     /// Decode the `Date` with a custom date format string
     case format(String)
-    /// Return a `Date` from the JSON value
-    /// If the return value is nil and it is being mapped to
-    /// a non-optional `Date` property an Exception will be thrown
-    case custom((Any?) -> Date?)
     
-    public static func == (lhs: DateFormat, rhs: DateFormat) -> Bool {
+    internal static func == (lhs: DateFormat, rhs: DateFormat) -> Bool {
         switch (lhs, rhs) {
         case (.secondsSince1970, .secondsSince1970),
              (.millisecondsSince1970, .millisecondsSince1970),
@@ -43,7 +62,7 @@ public enum DateFormat: Hashable, JSONTransformer {
         }
     }
     
-    public var hashValue: Int {
+    internal var hashValue: Int {
         switch self {
         case .secondsSince1970:
             return "secondsSince1970".hashValue
@@ -53,32 +72,15 @@ public enum DateFormat: Hashable, JSONTransformer {
             return "iso8601".hashValue
         case .format(let format):
             return format.hashValue
-        case .custom(_):
-            return ".custom(_:)".hashValue
         }
     }
     
-    public var keyPath: JSONKeyPath? {
+    internal var keyPath: JSONKeyPath? {
         return nil
     }
     
-    public func transform(_ json: inout [String : Any], mappingTo propertyKey: PropertyKey) {
+    internal func transform(_ json: inout [String : Any], mappingTo propertyKey: PropertyKey) {
         let keyPath = resolvedKeyPath(propertyKey)
-        
-        switch self {
-        case .custom(let adapter):
-            guard let date = adapter(json[jsonKeyPath: keyPath]) else {
-                // If `date` is nil and the property being transformed is explicitly non-optional
-                // JSONDecoder will throw an error and initialization will fail
-                return
-            }
-            let dateFormatter = DateFormat.millisecondsSince1970.dateFormatter
-            json[propertyKey] = Int(dateFormatter.string(from: date))
-            return
-        default:
-            break
-        }
-        
         let possibleDateString: String?
         switch json[jsonKeyPath: keyPath] {
         case let unformattedDateString as String:
@@ -101,25 +103,4 @@ public enum DateFormat: Hashable, JSONTransformer {
             json[propertyKey] = Int(millisecondsSince1970String)
         }
     }
-    
-    public func reverseTransform(_ json: inout [String : Any], mappingFrom propertyKey: PropertyKey) {
-        
-        
-    }
 }
-
-/// Decode the `Date` as a UNIX timestamp from a JSON number.
-public let secondsSince1970 = DateFormat.secondsSince1970
-/// Decode the `Date` as UNIX millisecond timestamp from a JSON number.
-public let millisecondsSince1970 = DateFormat.millisecondsSince1970
-/// Decode the `Date` as an ISO-8601-formatted string (in RFC 3339 format).
-public let iso8601 = DateFormat.iso8601
-/// Decode the `Date` with a custom date format string
-public func format(_ format: String) -> DateFormat { return DateFormat.format(format) }
-/// Return a `Date` from the JSON value
-/// If the return value is nil and it is being mapped to
-/// a non-optional `Date` property an Exception will be thrown
-public func custom(_ adapter: @escaping (Any?) -> Date?) -> DateFormat { return DateFormat.custom(adapter) }
-// Assign the current date to the `Date` property
-public let currentDate = DateFormat.custom { _ in return Date() }
-

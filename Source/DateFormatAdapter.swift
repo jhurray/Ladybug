@@ -73,8 +73,6 @@ internal extension DateFormat {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = format
             return dateFormatter
-        default:
-            fatalError("Should never be using date formatter from the custom type")
         }
     }
 }

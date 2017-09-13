@@ -89,7 +89,7 @@ class JSONTransformerTests: XCTestCase {
             let date = formatter.date(from: dateString)!
             return date
         }
-        let transformer = JSONKeyPath("date_key") <- DateFormat.custom(adapter)
+        let transformer = JSONKeyPath("date_key") <- custom(adapter)
         let formatter = DateFormatter()
         formatter.dateFormat = formatString
         let date = formatter.date(from: jsonDictionary["date_key"] as! String)
@@ -101,8 +101,6 @@ class JSONTransformerTests: XCTestCase {
         XCTAssertEqual(DateFormat.millisecondsSince1970, DateFormat.millisecondsSince1970)
         XCTAssertEqual(DateFormat.iso8601, DateFormat.iso8601)
         XCTAssertEqual(DateFormat.format("ok kewl"), DateFormat.format("ok kewl"))
-        XCTAssertNotEqual(custom({ _ in return nil}), custom({ _ in return nil}))
-        XCTAssertNotEqual(currentDate, currentDate)
     }
     
     func testDefaultValueTransformer() {
@@ -112,9 +110,9 @@ class JSONTransformerTests: XCTestCase {
     }
     
     func testMapTransformer() {
-        let transformer = Map<Int>(keyPath: "map_key") { value in
+        let transformer = Map<Int>(keyPath: "map_key", map: { value in
             return Int(value as! String)
-        }
+        })
         testTransform(with: transformer, propertyKey:"mapKey", expectedValue: 4)
     }
 }
