@@ -46,6 +46,9 @@
 		7977C2101F69CD3D008C3490 /* ExamplePerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7977C20F1F69CD3D008C3490 /* ExamplePerformanceTests.swift */; };
 		7977C2191F69CD5F008C3490 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7977C2181F69CD5F008C3490 /* Tree.swift */; };
 		7977C21A1F69CFED008C3490 /* Ladybug.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26AF152A1F2D6E7300D963FF /* Ladybug.framework */; };
+		79B26BBD1F7225C300C90DE6 /* JSONTransformer+Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261139921F568996001C7AB9 /* JSONTransformer+Date.swift */; };
+		79B26BBE1F7225C300C90DE6 /* JSONTransformer+Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261139921F568996001C7AB9 /* JSONTransformer+Date.swift */; };
+		79B26BBF1F7225C400C90DE6 /* JSONTransformer+Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261139921F568996001C7AB9 /* JSONTransformer+Date.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -558,6 +561,7 @@
 				26AF15961F2D80BF00D963FF /* JSONKeyPath.swift in Sources */,
 				264615A31F4906BC00789AB1 /* JSONTransformer.swift in Sources */,
 				26AF15A31F2F0BB800D963FF /* DateFormatAdapter.swift in Sources */,
+				79B26BBD1F7225C300C90DE6 /* JSONTransformer+Date.swift in Sources */,
 				26AF158F1F2D71DC00D963FF /* JSONCodable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -569,6 +573,7 @@
 				26AF15971F2D80C000D963FF /* JSONKeyPath.swift in Sources */,
 				264615A41F4906BC00789AB1 /* JSONTransformer.swift in Sources */,
 				26AF15A41F2F0BB900D963FF /* DateFormatAdapter.swift in Sources */,
+				79B26BBE1F7225C300C90DE6 /* JSONTransformer+Date.swift in Sources */,
 				26AF15901F2D71DC00D963FF /* JSONCodable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -580,6 +585,7 @@
 				26AF15981F2D80C000D963FF /* JSONKeyPath.swift in Sources */,
 				264615A51F4906BD00789AB1 /* JSONTransformer.swift in Sources */,
 				26AF15A51F2F0BBA00D963FF /* DateFormatAdapter.swift in Sources */,
+				79B26BBF1F7225C400C90DE6 /* JSONTransformer+Date.swift in Sources */,
 				26AF15911F2D71DD00D963FF /* JSONCodable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

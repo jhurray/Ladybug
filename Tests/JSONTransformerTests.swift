@@ -80,7 +80,7 @@ class JSONTransformerTests: XCTestCase {
     }
     
     func testCustomDateTransformer() {
-        let adapter: (Any?) -> Date? = { (object) -> Date? in
+        let transformer = JSONKeyPath("date_key") <- custom { object in
             guard let dateString = object as? String else {
                 return Date()
             }
@@ -89,7 +89,6 @@ class JSONTransformerTests: XCTestCase {
             let date = formatter.date(from: dateString)!
             return date
         }
-        let transformer = JSONKeyPath("date_key") <- custom(adapter)
         let formatter = DateFormatter()
         formatter.dateFormat = formatString
         let date = formatter.date(from: jsonDictionary["date_key"] as! String)

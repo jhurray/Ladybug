@@ -15,18 +15,18 @@ public typealias PropertyKey = String
 public protocol JSONCodable: Codable {
     
     /**
-     Initialize an object with JSON Data
-     
-     - Parameter data: JSON Data that will be serialized and mapped to the conforming object
-     */
-    init(data: Data) throws
-    
-    /**
      Initialize an object with a JSON object
      
      - Parameter json: JSON object that will be mapped to the conforming object
      */
     init(json: Any) throws
+    
+    /**
+     Initialize an object with JSON Data
+     
+     - Parameter data: JSON Data that will be serialized and mapped to the conforming object
+     */
+    init(data: Data) throws
     
     /// Encode the object into a JSON object
     func toJSON() throws -> Any
@@ -91,6 +91,21 @@ public extension Array where Element: JSONCodable {
     /// A transformer that explicitly declares a nested list type
     public static var transformer: JSONTransformer {
         return NestedListTransformer<Element>()
+    }
+}
+
+/// For use if you are using `JSONCodable` as a generic constraint
+/// because Array does not explicitly conform to `JSONCodable`
+public struct List<T: JSONCodable>: JSONCodable {
+    
+    public let object: Array<T>
+    
+    public init(json: Any) throws {
+        object = try Array<T>(json: json)
+    }
+    
+    public init(data: Data) throws {
+        object = try Array<T>(data: data)
     }
 }
 

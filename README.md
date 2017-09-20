@@ -9,28 +9,33 @@ Ladybug makes it easy to write a model or data-model layer in Swift 4. Full `Cod
 
 ### Quick Links
 * [Codable vs JSONCodable](#why-bug)
-* [Cocoapods & Carthage](#ingestion)
+* [Installation](#ingestion)
+* [Decoding](#decoding)
+* [Encoding](#encoding)
 * [Mapping JSON to properties](#json-to-property)
+  * [JSONKeyPath](#jsonkeypath) 
   * [Nested Objects](#nested-objects)
   * [Dates](#dates)
   * [Additional Mapping](#mapping)
   * [Default Values / Migration](#default-values)
-  * [JSONKeyPath](#jsonkeypath)
+* [Generic Constraints](#generics)
+* [Handling Failure](#failure)
+* [Class Conformance](#class-conformance)
 * [Musings 🤔](#musings)
 
-## Codable vs JSONCodable? <a name="why-bug"></a>
+## `Codable` vs `JSONCodable`? <a name="why-bug"></a>
 
-Ladybug provides the `JSONCodable` protocol which conforms to [`Codable`](https://developer.apple.com/documentation/swift/codable). Lets compare how we would create an object using `Codable` vs. using `JSONCodable`.
+Ladybug provides the `JSONCodable` protocol which is a subprotocol of [`Codable`](https://developer.apple.com/documentation/swift/codable). Lets compare how we would create an object using `Codable` vs. using `JSONCodable`.
 
 Lets model a `Tree`. I want this object to be `Codable` so I can decode from JSON and encode to JSON.
 
-I have some JSON:
+Here is some JSON:
 
 ```json
 {
     "tree_names": {
         "colloquial": ["pine", "big green"],
-        "scientific": "piniferous scientificus"
+        "scientific": ["piniferous scientificus"]
     },
     "age": 121,
     "family": 1,
@@ -75,10 +80,6 @@ struct Tree: Codable {
     
     enum NameKeys: String, CodingKey {
         case name = "colloquial"
-    }
-    
-    enum LeavesKeys: Int, CodingKey {
-        case first = 0
     }
     
     enum DecodingError: Error {
@@ -204,7 +205,7 @@ struct Tree_JSONCodable: JSONCodable {
 }
 ```
 
-As you can see, you only need provide mappings for the JSON keys that done explicitly map to property names.
+As you can see, you only need provide mappings for the JSON keys that don't explicitly map to property names.
 
 ### Decoding `Tree: JSONCodable`
 
@@ -220,7 +221,7 @@ let data = try tree.toData()
 
 Ladybug will save you time and energy when creating models in Swift by providing `Codable` conformance without the headache.
 
-## Setup <a name="ingestion"></a>
+## Installation <a name="ingestion"></a>
 
 #### Cocoapods
 
@@ -238,39 +239,77 @@ Add the following to your `Cartfile`
 github "jhurray/Ladybug" ~> 2.0.0
 ```
 
+## Decoding <a name="decoding"></a>
+
+You can decode any object or array of objects conforming to `JSONCodable` from a JSON object, or `Data`. 
+
+```swift
+/// Decode the given object from a JSON object
+init(json: Any) throws
+/// Decode the given object from `Data`
+init(data: Data) throws
+```
+
+**Example:**    
+
+```swift
+let tree = try Tree(json: treeJSON)
+let forest = try Array<Tree>(json: [treeJSON, treeJSON, treeJSON])
+```
+
+Both initializers will throw an exception if decoding fails.
+
+## Encoding <a name="encoding"></a>
+
+You can encode any object or array of objects conforming to `JSONCodable` to a JSON object or to `Data` 
+
+```swift
+/// Encode the object into a JSON object
+func toJSON() throws -> Any
+/// Encode the object into Data
+func toData() throws -> Data
+```
+
+**Example:**    
+
+```swift
+let jsonObject = try tree.toJSON()
+let jsonData = try forest.toData()
+```
+
+Both functions will throw an exception if encoding fails.
+
 ## Mapping JSON Keys to Properties <a name="json-to-property"></a>
 
 By conforming to the `JSONCodable` protocol provided by Ladybug, you can initialize any `struct` or `final class` with `Data` or a JSON object. If your JSON structure diverges form your data model, you can override the static `transformersByPropertyKey` property to provide custom mapping.
 
 
 ```swift
-struct Tree: JSONCodable {
+struct Flight: JSONCodable {
     
-    enum Family: Int, Codable {
-        case deciduous, coniferous
+    enum Airline: String, Codable {
+        case delta, united, jetBlue, spirit, other
     }
     
-    let name: String
-    let family: Family
-    let age: Int
+    let airline: Airline
+    let number: Int
     
     static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
-    	"name": JSONKeyPath("tree_name")
+    	"number": JSONKeyPath("flight_number")
     ]
 }
 ...
-let treeJSON = [
-  "tree_name": "pine",
-  "age": 121,
-  "family": 1
+let flightJSON = [
+  "airline": "united",
+  "flight_number": 472,
 ]
 ...
-let pineTree = try Tree(json: treeJSON)
-let forest = try Array<Tree>(json: [treeJSON, treeJSON, treeJSON])
+let directFlight = try Flight(json: flightJSON)
+let flightWithLayover = try Array<Flight>(json: [flightJSON, otherFlightJSON])
 
 ```
 
-`pineTree` and `forest` are fully initialized and can be encoded and decoded. Simple as that. 
+`directFlight ` and `flightWithLayover ` are fully initialized and can be encoded and decoded. Simple as that. 
 
 **Note:** Any nested enum must conform to `Codable` and `RawRepresentable` where the `RawValue` is `Codable`.
 
@@ -295,6 +334,7 @@ In the example at the beginning we used `JSONKeyPath` to map the value associate
 In the example below:
 
 * `JSONKeyPath("foo")` maps to `{"hello": "world"}`
+* Similarly, `"foo"` maps to `{"hello": "world"}`
 * `JSONKeyPath("foo", "hello")` maps to `"world"`
 * `JSONKeyPath("bar", 0)` maps to `"lorem"`
 
@@ -315,7 +355,7 @@ In the example below:
 **Note:** JSONKeyPath can also be expressed as a string literal.
 > `JSONKeyPath("some_key")` == `"some_key"`
 
-**Note:** You can also use keypath notation from Objective-C.
+**Note:** You can also use Objective-C keypath notation.
 > `JSONKeyPath("foo", "hello")` == `JSONKeyPath("foo.hello")` ==  `"foo.hello"`
 
 This does not work for `Int` subscripts
@@ -324,72 +364,66 @@ This does not work for `Int` subscripts
 
 ### Nested Objects <a name="nested-objects"></a>
 
-Lets add a nested class, `Leaf`. Trees have leaves. Nice.
+Lets add a nested class, `Passenger`. Flights have passengers. Nice.
 
-You can use the static `transformer` property to map JSON objects or object lists to types conforming to `JSONCodable`.
+You can denote a nested object via the static `transformer` property of any object or array of objects conforming to `JSONCodable`.
+
+You can combine transformers using the `<-` operator. In this case, for the `airMarshal` property, both the key path and the nested object need explicit transforms.
 
 ```json
 {
-  "tree_name": "pine",
-  "age": 121,
-  "family": 1,
-  "leaves": [
+  "airline": "united",
+  "flight_number": 472,
+  "air_marshal" {
+     "name": "50 Cent",
+  }
+  "passengers": [
   	  {
-  	  "size": "large",
-  	  "is_attached": true
+  	  "name": "Jennifer Lawrence",
   	  },
   	  {
-  	  "size": "small",
-  	  "is_attached": false
-  	  }
+  	  "name": "Chris Pratt"
+  	  },
+  	  ... 
   ]
 }
 
 ```
 
 ```swift
-struct Tree: JSONCodable {
+struct Flight: JSONCodable {
 	...
-    let firstLeaf: Leaf?
-    let leaves: [Leaf]
+    let passengers: [Passenger]
+    let airMarshal: Passenger
     ...
     static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
     	...
-    	"leaves": [Leaf].transformer,
-    	"firstLeaf": Leaf.transformer
+    	"passengers": [Passenger].transformer,
+    	"airMarshal": "air_marshal" <- Passenger.transformer
     ]
     
-    struct Leaf: JSONCodable {
-        ...
+    struct Passenger: JSONCodable {
+        let name: String
     }
 }
 ```
 
+**Note:** When using the `<-` operator, always put the `JSONKeyPath` transformer first.
+
 ### Dates
 
-Finally, lets add dates to the mix. You can use `DateTransformer` to map formatted date strings, ints, or doubles from JSON to `Date` objects.
+Finally, lets add dates to the mix. Ladybug provides multiple date transformers:
 
-Ladybug supports multiple date parsing formats:
-
-```swift
-public enum DateTransformer.Format: Hashable {
-   /// Decode the `Date` as a UNIX timestamp from a JSON number.
-   case secondsSince1970
-   /// Decode the `Date` as UNIX millisecond timestamp from a JSON number.
-   case millisecondsSince1970
-   /// Decode the `Date` as an ISO-8601-formatted string (in RFC 3339 format).
-   case iso8601
-   /// Decode the `Date` with a custom date format string
-   case custom(format: String)
-}
-```
-
-You can also use initializers with a `customAdapter` of type `(Any?) -> Date?`
+* `secondsSince1970`: Decode the date as a UNIX timestamp from a JSON number.
+* `millisecondsSince1970`: Decode the date as UNIX millisecond timestamp from a JSON number.
+* `iso8601`: Decode the date as an ISO-8601-formatted string (in RFC 3339 format).
+* `format(_ format: String)`: Decode the date with a custom date format string.
+* `custom(_ adapter: @escaping (Any?) -> Date?)`: Return a `Date` from the JSON value.
 
 ```json
 {
 "july4th": "7/4/1776",
-"Y2K": 946684800,
+"y2k": 946684800,
 }
 ```
 
@@ -400,16 +434,14 @@ struct SomeDates: JSONCodable {
     let createdAt: Date
     
     static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
-        "july4th": DateTransformer(format: .custom(format: "MM/dd/yyyy")),
-        "Y2K": DateTransformer(format: .secondsSince1970),
-        "createdAt": DateTransformer(customAdapter: { (_) -> Date? in
-            return Date()
-        })
+        "july4th": format("MM/dd/yyyy"),
+        "Y2K": "y2k" <- secondsSince1970,
+        "createdAt": custom { _ in return Date() }
     ]
 }
 ```
 
-**Note:** If using `customAdapter` to map to a non-optional `Date`, returning `nil` will result in an error being thrown. 
+**Note:** If using `custom` to map to a non-optional `Date`, returning `nil` will result in an exception being thrown during decoding. 
 
 ### Additional Mapping: `Map<T: Codable>` <a name="mapping"></a>
 
@@ -420,7 +452,7 @@ If you need to provide a simple mapping from a JSON value to a property, use `Ma
 "count": "100"
 }
 ...
-struct Object: JSONCodable {
+struct BottlesOfBeerOnTheWall: JSONCodable {
     let count: Int
     
     static let transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
@@ -431,7 +463,7 @@ struct Object: JSONCodable {
 
 ### Default Values / Migrations: `Default` <a name="default-values"></a>
 
-If you wish to supply a default value for a property, you can use `DefaultValueTransformer`. You supply the default value, and can also control whether or not to override the property if the property key exists in the JSON payload.
+If you wish to supply a default value for a property, you can use `Default`. You supply the default value, and can also control whether or not to override the property if the property key exists in the JSON payload.
 
 ```swift
 init(value: Any, override: Bool = false)
@@ -439,22 +471,45 @@ init(value: Any, override: Bool = false)
 
 The default transformer is useful when API's change, and can help migration from cached JSON data to `JSONCodable` objects with new properties.
 
+## Using `JSONCodable` as a Generic Constraint <a name="generics"></a>
 
-## Handling Failure
+Because `Array` does not explicitly conform to `JSONCodable`, `JSONCodable` does not support list types when used as a generic constraint. If you need this support, you can use the `List<T: JSONCodable>` wrapper type.
+
+```swift
+struct Tweet: JSONCodable { ... }
+class ContentProvider<T: JSONCodable> { ... }
+
+let tweetDetailProvider = ContentProvider<Tweet>()
+let timelineProvider = ContentProvider<List<Tweet>>()
+```
+
+## Handling Failure <a name="failure"></a>
 
 ### Exceptions
-Ladybug is failure driven, and all `JSONCodable` initializers throw exceptions if they fail. There is a `JSONCodableError` type that Ladybug will throw if there is a typecasting error, and Ladybug will also throw exceptions from `JSONSerialization` and `JSONDecoder`.
+Ladybug is failure driven, and all `JSONCodable` initializers and encoding mechanisms throw exceptions if they fail. There is a `JSONCodableError` type that Ladybug will throw if there is a typecasting error, and Ladybug will also throw exceptions from `JSONSerialization`, `JSONDecoder`, and `JSONEncoder`.
 
 ### Optionals
 If a value is optional in your JSON payload, it should be optional in your data model. Ladybug will only throw an exception if a key is missing and the property it is being mapped to is non-optional. Play it safe kids, use optionals.
 
-### Type Safety for `Map` and `custom`
+### Safety for `Map` and Custom Dates
 
-## Class Conformance to `JSONCodable`
+There are 2 transformers that can return `nil` values: `Map<T: Codable>` and `custom(_ adapter: @escaping (Any?) -> Date?)`.
 
-There is a small caveat to keep in mind when you are conforming a `class` to `JSONCodable`. Because classes in swift dont come with baked in default initializers like structs do, you have to make sure properties are initialized. You can do this by supplying default values, or a default initializer that initializes these values.
+If you are decoding from an already encoded `JSONCodable` object, returning `nil` is fine.
+
+If you are decoding from a `URLResponse`, returning nil can lead to an exception being thrown.
+
+## Class Conformance to `JSONCodable` <a name="class-conformance"></a>
+
+There are 2 small caveat to keep in mind when you are conforming a `class` to `JSONCodable`:
+
+1) Because classes in swift dont come with baked in default initializers like structs do, you have to make sure properties are initialized. You can do this by supplying default values, or a default initializer that initializes these values.
 
 You can see examples in [`ClassConformanceTests.swift`](https://github.com/jhurray/Ladybug/blob/master/Tests/ClassConformanceTests.swift).
+
+2) Subclassing an object conforming to `Codable` will not work, so it won't work for `JSONCodable` either.
+
+Because of these caveats, I would suggest using structs for your data models. 
 
 ## Thoughts About 🐞 <a name="musings"></a>
 
@@ -471,6 +526,10 @@ static var transformersByPropertyKey: [PropertyKey: JSONTransformer] = [
 ```
 
 There was no disussion of this in [SE-0161](https://github.com/apple/swift-evolution/blob/master/proposals/0161-key-paths.md).
+
+### It would also be great if `Mirror` could be created for types instead of instances
+
+This would allow us to implicitly map nested objects conforming to `JSONCodable`.
 
 ### Whats wrong with `Codable`? <a name="why-not-codable"></a>
 
@@ -497,6 +556,10 @@ struct FibonacciSequence: JSONCodable {
 	]
 }
 ```
+
+## Credits
+
+Shoutout to the good folks at [Mantle](https://github.com/Mantle/Mantle) for giving me some inspiration on this project. I'm pretty happy a similar framework is finally possible for Swift without mixing in Obj-C runtime.
 
 ## Contact Info && Contributing
 

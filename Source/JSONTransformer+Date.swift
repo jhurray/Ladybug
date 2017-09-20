@@ -14,7 +14,7 @@ public let secondsSince1970: JSONTransformer = DateFormat.secondsSince1970
 public let millisecondsSince1970: JSONTransformer = DateFormat.millisecondsSince1970
 /// Decode the `Date` as an ISO-8601-formatted string (in RFC 3339 format).
 public let iso8601: JSONTransformer = DateFormat.iso8601
-/// Decode the `Date` with a custom date format string
+/// Decode the `Date` with a custom date format string.
 public func format(_ format: String) -> JSONTransformer { return DateFormat.format(format) }
 /// Return a `Date` from the JSON value
 /// If the return value is nil and it is being mapped to
