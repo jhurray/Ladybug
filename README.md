@@ -171,7 +171,7 @@ let data = try encoder.encode(tree)
 #### `Tree: JSONCodable` Implementation
 
 ```swift
-struct Tree_JSONCodable: JSONCodable {
+struct Tree: JSONCodable {
     
     enum Family: Int, Codable {
         case deciduous, coniferous
@@ -344,8 +344,8 @@ In the example below:
      "hello": "world"
   },
   "bar": [ 
-  		"lorem",
-  		"ipsum"
+  	 "lorem",
+  	 "ipsum"
   ]  
 }
 ```
@@ -376,7 +376,7 @@ You can combine transformers using the `<-` operator. In this case, for the `air
   "flight_number": 472,
   "air_marshal" {
      "name": "50 Cent",
-  }
+  },
   "passengers": [
   	  {
   	  "name": "Jennifer Lawrence",
