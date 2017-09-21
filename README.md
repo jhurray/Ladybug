@@ -124,18 +124,6 @@ struct Tree: Codable {
             case isAttached = "is_attached"
             case size
         }
-        
-        init(from decoder: Decoder) throws {
-            let values = try decoder.container(keyedBy: CodingKeys.self)
-            size = try values.decode(Size.self, forKey: .size)
-            isAttached = try values.decode(Bool.self, forKey: .isAttached)
-        }
-        
-        func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(size, forKey: .size)
-            try container.encode(isAttached, forKey: .isAttached)
-        }
     }
 }
 ```
