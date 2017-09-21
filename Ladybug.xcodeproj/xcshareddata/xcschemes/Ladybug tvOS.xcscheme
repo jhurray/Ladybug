@@ -29,7 +29,26 @@
       language = ""
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "26AF15321F2D6E7300D963FF"
+               BuildableName = "Ladybug Tests.xctest"
+               BlueprintName = "Ladybug Tests"
+               ReferencedContainer = "container:Ladybug.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "26AF15551F2D6EFE00D963FF"
+            BuildableName = "Ladybug.framework"
+            BlueprintName = "Ladybug tvOS"
+            ReferencedContainer = "container:Ladybug.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>

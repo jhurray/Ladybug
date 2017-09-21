@@ -54,7 +54,7 @@ fileprivate final class TimestampDateFormatter: DateFormatterProtocol {
 
 extension DateFormatter: DateFormatterProtocol {}
 
-internal extension DateTransformer.Format {
+internal extension DateFormat {
     
     internal var dateFormatter: DateFormatterProtocol {
         switch self {
@@ -69,7 +69,7 @@ internal extension DateTransformer.Format {
             dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
             dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
             return dateFormatter
-        case .custom(let format):
+        case .format(let format):
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = format
             return dateFormatter
@@ -81,9 +81,9 @@ internal final class DateFormatAdapter {
     
     static let shared: DateFormatAdapter = DateFormatAdapter()
     
-    private var storage: [DateTransformer.Format: DateFormatterProtocol] = [:]
+    private var storage: [DateFormat: DateFormatterProtocol] = [:]
     
-    func convert(_ dateString: String, fromFormat: DateTransformer.Format, toFormat: DateTransformer.Format) -> String? {
+    func convert(_ dateString: String, fromFormat: DateFormat, toFormat: DateFormat) -> String? {
         
         guard let date = storage[fromFormat, default: fromFormat.dateFormatter].date(from: dateString) else {
             return nil
