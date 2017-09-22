@@ -257,7 +257,7 @@ let tree = try Tree(json: treeJSON)
 let forest = try Array<Tree>(json: [treeJSON, treeJSON, treeJSON])
 ```
 
-Both initializers will throw an exception if decoding fails.
+Both initializers will throw an error if decoding fails.
 
 ## Encoding <a name="encoding"></a>
 
@@ -277,7 +277,7 @@ let jsonObject = try tree.toJSON()
 let jsonData = try forest.toData()
 ```
 
-Both functions will throw an exception if encoding fails.
+Both functions will throw an error if encoding fails.
 
 ## Mapping JSON Keys to Properties <a name="json-to-property"></a>
 
@@ -441,7 +441,7 @@ struct SomeDates: JSONCodable {
 }
 ```
 
-**Note:** If using `custom` to map to a non-optional `Date`, returning `nil` will result in an exception being thrown during decoding. 
+**Note:** If using `custom` to map to a non-optional `Date`, returning `nil` will result in an error being thrown during decoding. 
 
 ### Additional Mapping: `Map<T: Codable>` <a name="mapping"></a>
 
@@ -485,11 +485,11 @@ let timelineProvider = ContentProvider<List<Tweet>>()
 
 ## Handling Failure <a name="failure"></a>
 
-### Exceptions
-Ladybug is failure driven, and all `JSONCodable` initializers and encoding mechanisms throw exceptions if they fail. There is a `JSONCodableError` type that Ladybug will throw if there is a typecasting error, and Ladybug will also throw exceptions from `JSONSerialization`, `JSONDecoder`, and `JSONEncoder`.
+### Errors
+Ladybug is failure driven, and all `JSONCodable` initializers and encoding mechanisms throw errors if they fail. There is a `JSONCodableError` type that Ladybug will throw if there is a typecasting error, and Ladybug will also throw errors from `JSONSerialization`, `JSONDecoder`, and `JSONEncoder`.
 
 ### Optionals
-If a value is optional in your JSON payload, it should be optional in your data model. Ladybug will only throw an exception if a key is missing and the property it is being mapped to is non-optional. Play it safe kids, use optionals.
+If a value is optional in your JSON payload, it should be optional in your data model. Ladybug will only throw an error if a key is missing and the property it is being mapped to is non-optional. Play it safe kids, use optionals.
 
 ### Safety for `Map` and Custom Dates
 
@@ -497,7 +497,7 @@ There are 2 transformers that can return `nil` values: `Map<T: Codable>` and `cu
 
 If you are decoding from an already encoded `JSONCodable` object, returning `nil` is fine.
 
-If you are decoding from a `URLResponse`, returning nil can lead to an exception being thrown.
+If you are decoding from a `URLResponse`, returning nil can lead to an error being thrown.
 
 ## Class Conformance to `JSONCodable` <a name="class-conformance"></a>
 

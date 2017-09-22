@@ -37,7 +37,7 @@ public protocol JSONCodable: Codable {
     static var transformersByPropertyKey: [PropertyKey: JSONTransformer] { get }
 }
 
-/// Exception type thrown by objects conforming to JSONCodable
+/// Error type thrown by objects conforming to JSONCodable
 public enum JSONCodableError: Swift.Error {
     /// Thrown when an object conforming to JSONCodable expects a certain type, but receives another
     case badType(expectedType: Any.Type, receivedType: Any.Type)

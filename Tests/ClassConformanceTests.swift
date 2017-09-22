@@ -59,7 +59,7 @@ class ClassConformanceTests: XCTestCase {
             XCTAssertEqual(shirt.size, .large)
         }
         catch let error {
-            XCTFail("Caught exception: \(error)")
+            XCTFail("Caught error: \(error)")
         }
     }
     
@@ -72,7 +72,7 @@ class ClassConformanceTests: XCTestCase {
             XCTAssertEqual(shirt.size, .large)
         }
         catch let error {
-            XCTFail("Caught exception: \(error)")
+            XCTFail("Caught error: \(error)")
         }
     }
 }

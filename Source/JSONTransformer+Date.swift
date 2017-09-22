@@ -18,7 +18,7 @@ public let iso8601: JSONTransformer = DateFormat.iso8601
 public func format(_ format: String) -> JSONTransformer { return DateFormat.format(format) }
 /// Return a `Date` from the JSON value
 /// If the return value is nil and it is being mapped to
-/// a non-optional `Date` property an Exception will be thrown
+/// a non-optional `Date` property an error will be thrown
 public func custom(_ adapter: @escaping (Any?) -> Date?) -> JSONTransformer {
     return Map<Int> { value in
         guard let date = adapter(value) else {
